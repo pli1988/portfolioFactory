@@ -1,0 +1,6 @@
+universeName = testUniverse
+tickerPath = tickers.txt
+startDate = 1/1/2009 
+endDate = 6/1/2012
+currency = USD
+nanFill = 'ffill'
