@@ -1,0 +1,10 @@
+strategyName = testStrategy
+tickerPath = tickers_strategy.txt
+startDate = 1/1/2010 
+endDate = 6/1/2012
+strategySignal = momentum
+frequency = 19
+universe = testUniverse
+cutoff = 2
+scheme = rank
+weight = squared
