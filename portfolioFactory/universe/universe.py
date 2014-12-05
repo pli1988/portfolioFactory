@@ -5,7 +5,7 @@ Created on Wed Nov 26 16:05:31 2014
 @author: peter
 """
 # Example
-# testUniverse = universe('usEquityConfig.txt')
+testUniverse = universe('usEquityConfig.txt')
 
 # TODO: Add frequency parameter ??? maybe
 # TODO: Add Checks
