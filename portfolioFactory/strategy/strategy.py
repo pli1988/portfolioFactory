@@ -36,7 +36,7 @@ class strategy(object):
     def __init__(self,returnsUniverse,configPath):
         
         self.parameters = self.__readConfig(configPath)
-        self.universe = returnsUniverse.returns
+        self.universe = returnsUniverse.returns.copy()
         self.__setSignal()
         self.__setSelection()
         self.__setWeights()
