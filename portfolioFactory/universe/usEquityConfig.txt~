@@ -1,4 +1,0 @@
-universeName = USEquityUniverse
-totalReturnFilePath = tickers.txt
-currency = USD
-nanFill = 'ffill'
