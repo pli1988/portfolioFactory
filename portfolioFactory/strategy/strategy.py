@@ -24,12 +24,13 @@ class strategy(object):
         - the investment universe on which the strategy is defined
         - the signal used to select specific investments
         - the weighting scheme used to allocate funds across the selected investments
+        - these 3 components are used to generate the value of that
     
     Public Attributes:
         Data attributes:
         - signal: dataframe containing the signal used to select stocks (example: rolling returns)
-        - selection: dataframe of zeros and ones to identify the selected stocks
-        - weights: dataframe containing the weights allocated to each investment
+        - selection: dataframe of zeros and ones to identify the selected investments
+        - weights: dataframe containing the weights allocated to each selected investment
         - strategy: dataframe with the value of each investment and the total value ('value')
         - parameters: dictionary containing metadata
         
@@ -37,7 +38,7 @@ class strategy(object):
         - universe: the name of universe object on which the strategy is defined
         - signalName: the signal used to generate the strategy 
         - rule: the cutoff point for selecting investments
-        - window: size of window between rebalancing
+        - window: size of window between rebalancing 
         - startDate: starting date for strategy
         - endDate: ending date for strategy
     '''
@@ -78,6 +79,7 @@ class strategy(object):
         self.__setSignal()
         self.__setSelection()
         self.__setWeights()
+        self.__setStrategy()
         
         
         # TODO: Add checks for if file exists     
@@ -86,7 +88,12 @@ class strategy(object):
         
         Note:
             configPath is assumed to be a .txt file with (at least) the following fields:
-              - SSSSS
+              - name : a name/description for the strategy
+              - signalType: signal type used for selecting investments (ex. 'rollingReturns')
+              - rule: the cutoff point for selecting investment (positive/negative int-->pick top/bottom S investments)
+              - window: time-span between rebalancing
+              - startDate: strategy starting date
+              - endDate: strategy ending date
         
         Args:
             configPath (str): location of config file
@@ -124,7 +131,7 @@ class strategy(object):
     def __setSelection(self):
         """ Method to set self.selection
         
-            Note: includes checks to make sure there are enough non-Nan observation to make selection
+            Note: includes checks to make sure there are enough non-Nan observations to make full selection
         
         """
         
@@ -153,8 +160,8 @@ class strategy(object):
         """
         
         rawWeights = pd.DataFrame(1,index=self._rebalanceDates,columns=self._tickers)*self.selection
-        denWeights = rawWeights.sum(axis=1).replace(0,1)
-        normWeights = rawWeights/denWeights
+        sumWeights = rawWeights.sum(axis=1).replace(0,1)
+        normWeights = rawWeights/sumWeights
         self.weights = normWeights
         
         
@@ -163,6 +170,11 @@ class strategy(object):
     def __setStrategy(self):
         """ Method to set self.strategy
         
+            Calculates the value of each investment and the overall value of the strategy,
+            using the weights based on the input parameters.
+        
+            Returns:
+                A dataframe with the value of each investment and and the overall strategy ('value') 
         """
         
         # set parameters and lists to prepare for merge        
@@ -185,7 +197,7 @@ class strategy(object):
         portValueGlobal=0
         rebalanced = merged.groupby('block').apply(strategy.calcRebalancing,tickers=self._tickers)
          
-        # keep the stocks and total value columns
+        # keep the investment values and total value columns
         columnsToKeep = self._tickers.tolist()[:]
         columnsToKeep.append('value')
         self.strategy = rebalanced[columnsToKeep]

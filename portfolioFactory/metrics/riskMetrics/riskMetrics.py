@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Collection of risk metrics to operate on pandas series and dataframes
+Collection of risk metrics to operate on pandas (time)series and dataframes
 
-t
 """
 
 import pandas as pd
@@ -12,9 +11,14 @@ import nympy as np
 def main():
     pass
 
-
 def maxDrawdown(data):
     
+    ''' Calculate Maximum Drawdown.
+
+    Input: time series of price levels (first to last)
+    Output: Maximum peak to trough performance
+    
+    '''
     
     returns = np.append([0], data.values)
     indexLevel = np.cumprod(1+returns)
@@ -25,16 +29,29 @@ def maxDrawdown(data):
     
     return localDrawdown.min()
     
-def annualizedVolatility(data):
+def annualizedVolatility(data, freq):
     
-    pass
+    
+    ''' Calculate Annualized Volatility.
+
+    Input: time series of returns, frequenc of data
+    
+    Output: Annualized Volatility 
+    
+    '''    
+    
+    scalingFactor= {'d':  252, 'w': 52, 'm': 12, 'a': 1}    
+    
+    vol = np.std(data)* np.sqrt(scalingFactor[freq])
+    
+    return vol
     
 def beta(X, y):
     
     pass
 
 
-def VaR(data, horizon, confidence):
+def VaR(data, frequency, horizon, confidence):
     
     pass
 

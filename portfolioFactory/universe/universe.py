@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 """
 Created on Wed Nov 26 16:05:31 2014
@@ -5,52 +6,63 @@ Created on Wed Nov 26 16:05:31 2014
 @author: peter
 """
 # Example
-testUniverse = universe('usEquityConfig.txt')
+#testUniverse = universe('usEquityConfig.txt')
 
 # TODO: Add frequency parameter ??? maybe
 # TODO: Add Checks
 # TODO: Move fetchPrices to utility
 # TODO: Add summary 
+=======
+>>>>>>> origin/pliDEV
 
 import pandas as pd
-import pandas.io.data as web
+import numpy as np
 
 class universe(object):
-    '''
-    Class to represent investment universe. This class contains most of the 'data'
-    Input is read in from a config file. 
+    ''' Universe is a class to represent the set of possible investments. 
     
-    Attributes:
+    This class contains asset class returns and associated metadata.     
+    
+    Public Attributes:
         - parameters
-        - returns
-        - summary *
-    Methods:
-        - __readConfig
-        - __setReturn
-        - __getTickers
+        - assetReturns
+        - summary
+        - tickers
     '''
+    
     def __init__(self,configPath):
         
-        self.parameters = self.__readConfig(configPath) 
+        '''Reads in parameters from configPath and loads asset returns      
+        
+        Args:
+            configPath (str): location of config file
+          
+        '''
+        
+        self.parameters = self.__setParameters(configPath) 
         self.__setReturn()
         
-    def getTickers(self):
-            
-        tickerPath = self.parameters['tickerPath']
-                
-        with open(tickerPath, 'r') as f:
-            tickers = f.read()
-                   
-        tickers = tickers.strip().split(',')
-        tickers = map(str.strip,tickers)
-               
-        return tickers
+# TODO: Add checks for if file exists     
+    def __setParameters(self, configPath):
+        """ Method to read config file
         
-    def __readConfig(self, configPath):
-    
+        Note:
+            configPath is assumed to be a .txt file with (at least) the following fields:
+              - totallReturnFilePath
+        
+        Args:
+            configPath (str): location of config file
+          
+        Returns:
+            A dict with {key = parameter name: value = parameter value} 
+          
+        """
+        
+        # Load Data
         parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
         parameters.columns = ['values']        
         
+        # Strip spaces
         parameters = parameters.astype('string')        
         parameters.index = parameters.index.map(str.strip)        
         parameters = parameters['values'].map(str.strip)
@@ -59,21 +71,54 @@ class universe(object):
         
     def __setReturn(self):
         
-        names = self.getTickers()
-        returnsPanel = {n: universe.fetchPrices(n, self.parameters['startDate'], self.parameters['endDate']) for n in names}        
+        """ Method to set self.returns
         
-        px = pd.DataFrame(returnsPanel)
-        px = px.asfreq('B').fillna(method = 'pad')
-        rets = px.pct_change()
+        Note:
+            Assumes returns data exists in a pickled  pandas data frame
+                    
+        """
         
-        self.returns = rets
-          
-    @staticmethod
+        totalReturnsPath = self.parameters['totalReturnFilePath']
+               
+        self.assetReturns = pd.read_pickle(totalReturnsPath)
         
-    def fetchPrices(ticker, start, end):
+    def __setTickers(self):
+        
+        """ Method to set self.tickers
+
+        Extracts asset class tickers from returns dataframe
+        
+        """        
+        
+        self.tickers = self.returns.columns.values
+
+# Maybe move to utility ???
+    def computeSummary(self):
+        """ Method to compute summary statistics for return dataframe
+        
+        Returns:
+            Data frame containing:
+                - count data
+                - count missing values
+                - min
+                - max
+                - standard deviation (unadjusted)        
+        """
+        
+        df = self.assetReturns        
+        
+        # Summary statistiscs
+        summary = df.describe()
+        
+        # Number of NaNs
+        missingCounts = np.sum(df.apply(pd.isnull,0))
+        
+        # Format output dataframe
+        out = summary.ix[['count', 'mean', 'max', 'min', 'std']].T
+        out['missing'] = missingCounts
     
-        return web.get_data_yahoo(ticker, start, end)['Adj Close']
+        outOrder = ['count', 'missing', 'mean', 'max', 'min', 'std']
         
-
-
-
+        self.summary = out[outOrder]
+        
+        return self.summary

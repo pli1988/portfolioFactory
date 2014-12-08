@@ -1,6 +1,4 @@
-universeName = testUniverse
-tickerPath = tickers.txt
-startDate = 1/1/2009 
-endDate = 6/1/2012
+universeName = USEquityUniverse
+totalReturnFilePath = totalReturnData
 currency = USD
 nanFill = 'ffill'
