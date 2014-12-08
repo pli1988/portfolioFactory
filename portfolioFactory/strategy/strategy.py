@@ -14,6 +14,8 @@ import pandas as pd
 import numpy as np
 
 
+testStrategy = strategy(usEqUniverse,'strategyConfig.txt')
+
 class strategy(object):
 
     ''' Strategy is a class to represent investment strategies. 
@@ -62,7 +64,7 @@ class strategy(object):
         
         # pull parameters from config file 
         self.parameters = self.__setParameters(configPath)
-        self.parameters['universe']=str(universe)
+        self.parameters['universe']=universe.parameters['universeName']
         
         # set private attributes used for calculations
         self._signalType = self.parameters['signalType']
@@ -70,8 +72,8 @@ class strategy(object):
         self._window = int(self.parameters['window'])
         self._startDate = self.parameters['startDate']
         self._endDate = self.parameters['endDate']
-        self._tickers = universe.returns.columns.values
-        self._returns = universe.returns.copy()
+        self._tickers = universe.assetReturns.columns.values
+        self._returns = universe.assetReturns.copy()
         self._dates = self._returns[self._startDate : self._endDate].index
         self._rebalanceDates = self._dates[::self._window]
         
@@ -146,7 +148,7 @@ class strategy(object):
         if mask.sum(axis=1).sum() < np.abs(self._rule)*mask.shape[0]:
             print "Israel will add an error here"
             
-        self.selection = mask
+        self.selection = 1*mask
             
          
          
@@ -183,11 +185,10 @@ class strategy(object):
         weights['rebalance'] = 1
          
         # merge the returns dataframe with the weights dataframe and forward fill weight data
-        merged = pd.merge(self._returns,weights,how='left',left_index=True,right_index=True,suffixes=['_r','_w'])
+        merged = pd.merge(self._returns[self._startDate:self._endDate],weights,how='left',left_index=True,right_index=True,suffixes=['_r','_w'])
         merged['block'] = None
         merged['block'][merged.rebalance==1] = np.arange((merged.rebalance==1).sum())
         merged['block'] = merged['block'].fillna(method='ffill')
-        merged = merged[merged['block']!=0]
         merged = merged.drop('rebalance',axis=1)
         merged[weightTickers] = merged[weightTickers].fillna(method='ffill')
          
@@ -199,10 +200,10 @@ class strategy(object):
          
         # keep the investment values and total value columns
         columnsToKeep = self._tickers.tolist()[:]
+        columnsToKeep.append('block')
         columnsToKeep.append('value')
         self.strategy = rebalanced[columnsToKeep]
-         
-         
+
 
 
 
@@ -251,7 +252,7 @@ class strategy(object):
             portValueGlobal=1
         else:
             portValueGlobal = df['value'].iloc[-1]
-
+        print df
         return df
 
 

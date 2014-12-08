@@ -12,4 +12,4 @@ usEqUniverse = universe('usEquityConfig.txt')
 usEqUniverse.computeSummary()
 
 # Plot Return
-usEqUniverse.assetReturns.A.plot()
+usEqUniverse.assetReturns.AA.plot()

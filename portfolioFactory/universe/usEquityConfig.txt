@@ -1,4 +1,4 @@
 universeName = USEquityUniverse
-totalReturnFilePath = totalReturnData
+totalReturnFilePath = usReturnData_sub
 currency = USD
 nanFill = 'ffill'
