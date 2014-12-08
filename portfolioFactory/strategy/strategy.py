@@ -50,7 +50,7 @@ class strategy(object):
         
             1) Reads in parameters from configPath      
             2) Calculates signal and sets as attribute
-            3) Selects investments based on signal ands sets as attribute
+            3) Selects investments based on signal and sets as attribute
             4) Calculates weights ands sets as attribute
             5) Calculates strategy values and sets as attribute
             

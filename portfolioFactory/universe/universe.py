@@ -1,6 +1,6 @@
-<<<<<<< HEAD
-# -*- coding: utf-8 -*-
 """
+# -*- coding: utf-8 -*-
+
 Created on Wed Nov 26 16:05:31 2014
 
 @author: peter
@@ -12,8 +12,6 @@ Created on Wed Nov 26 16:05:31 2014
 # TODO: Add Checks
 # TODO: Move fetchPrices to utility
 # TODO: Add summary 
-=======
->>>>>>> origin/pliDEV
 
 import pandas as pd
 import numpy as np
