@@ -12,7 +12,7 @@ Here are just a few of the things that **portfolioFactory** does well:
 
   - Construction of asset pricing factors e.g. [**cross-sectional momentum portfolios**][momentum] 
 
-  - Calculating risk and return metrics
+  - Calculating risk and return metrics for timeseries
   
   - Plotting
 

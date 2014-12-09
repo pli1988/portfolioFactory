@@ -3,11 +3,14 @@
 
 This module contains a collection of risk metrics to operate on pandas timeseries
 
+Author: Peter Li
 """
 
 import pandas as pd
-import nympy as np
+import numpy as np
+from ..utils import utils as utils
 
+scalingFactor= {'d':  252, 'w': 52, 'm': 12, 'a': 1}
 
 def main():
     pass
@@ -23,11 +26,16 @@ def maxDrawdown(data):
       
     """    
     
-    returns = np.append([0], data.values)
+    cleanData = utils.trimData(data)
+    
+    # append zero to return series and compute level
+    returns = np.append([0], cleanData.values)
     indexLevel = np.cumprod(1+returns)
     
+    # Find running maximum
     runningMax = np.maximum.accumulate(indexLevel)
     
+    # Percent change relative to running maximum
     localDrawdown = indexLevel / runningMax -1
     
     return localDrawdown.min()
@@ -44,9 +52,9 @@ def annualizedVolatility(data, freq):
       
     """    
     
-    scalingFactor= {'d':  252, 'w': 52, 'm': 12, 'a': 1}    
+    cleanData = utils.trimData(data)         
     
-    vol = np.std(data)* np.sqrt(scalingFactor[freq])
+    vol = np.std(cleanData)* np.sqrt(scalingFactor[freq])
     
     return vol
     
@@ -74,49 +82,57 @@ def VaR(data, horizon, probability):
         VaR
       
     """  
-      
-    pass
+    
+    cleanData = utils.trimData(data)
 
-# Move to utilities
-def trimData(data):
-    ''' Function to drop NaN at the beginning and end of a dataframe
+    # Calculate annualized rolling returns
+    rollingReturns = pd.rolling_apply(cleanData, horizon, lambda x: np.prod(1 + x)**(12/horizon) - 1)
     
-    Function will return a data error is there are missing values in the middle    
+    VaR = np.percentile(rollingReturns.dropna(), 5)
     
-    '''
-    # check if there are any NaN values in the middle
-    try:
-        checkSeqential(data.dropna())
-        
-    except:
-        raise 
-        
-        
-    data.dro    
-    
-def checkSeqential(data):
-    
-    months = data.index.month
-    years = data.index.year
-    
-    monthsDiff = np.mod(months[1:]-months[0:-1],12)
-    
-    if all(monthsDiff == 1):
-    
-        yearsDiff = years[1:] - years[0:-1]
-        ix = np.where(yearsDiff == 1)
-    
-        if all(months[ix] == 12):
-            
-            return True
-        else:
-            print 'DANGER !!!'
-    else:
-        print 'DANGER !!!'
+    return VaR
+
+## Move to utilities
+#def trimData(data):
+#    ''' Function to drop NaN at the beginning and end of a dataframe
+#    
+#    Function will return a data error is there are missing values in the middle    
+#    
+#    '''
+#    # check if there are any NaN values in the middle
+#    if checkSeqentialMonthly(data.dropna()):
+#        
+#        return data.dropna()
+#        
+#    else:
+#        
+#        raise badData('trimData')
+#
+#def checkSeqentialMonthly(data):
+#    
+#    months = data.index.month
+#    years = data.index.year
+#    
+#    monthsDiff = np.mod(months[1:]-months[0:-1],12)
+#    
+#    if all(monthsDiff == 1):
+#    
+#        yearsDiff = years[1:] - years[0:-1]
+#        ix = np.where(yearsDiff == 1)
+#    
+#        if all(months[ix] == 12):
+#            
+#            return True
+#        else:
+#            return False 
+#    else:
+#        return False
 
 if __name__ == "__main__":
     main()
     
-    
+
+class badData(Exception):
+    pass
     
     
