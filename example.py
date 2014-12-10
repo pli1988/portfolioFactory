@@ -2,11 +2,13 @@
 """
 Created on Mon Dec  8 22:53:50 2014
 
-@author: peter
+Author: Peter Li
 """
 
 
 import portfolioFactory.universe.universe as universe
+
+
 import portfolioFactory.utils.utils as utils    
 import portfolioFactory.metrics.riskMetrics as riskMetrics
 import portfolioFactory.metrics.retMetrics as retMetrics
@@ -14,12 +16,8 @@ import portfolioFactory.metrics.retMetrics as retMetrics
 # Create Instance of universe for US Equities
 #usEqUniverse = universe.universe('portfolioFactory/universe/usEquityConfig.txt')
 
-try:
-    usEqUniverse = universe.universe('portfolioFactory/universe/usEquityConfig.txt')
-except:
-    print 'Error: Could not initialize universe'
-    raise
 
+usEqUniverse = universe.universe('testUniverse')
     
     
 testSeries = usEqUniverse.assetReturns.GS
@@ -39,3 +37,4 @@ usEqUniverse.assetReturns.A.plot()
 
 
 
+import unittest

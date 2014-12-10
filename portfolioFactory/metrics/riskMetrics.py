@@ -10,8 +10,6 @@ import pandas as pd
 import numpy as np
 from ..utils import utils as utils
 
-scalingFactor= {'d':  252, 'w': 52, 'm': 12, 'a': 1}
-
 def main():
     pass
 
@@ -40,7 +38,7 @@ def maxDrawdown(data):
     
     return localDrawdown.min()
     
-def annualizedVolatility(data, freq):
+def annualizedVolatility(data):
     
     """ Calculate annalized volatility
     
@@ -54,12 +52,12 @@ def annualizedVolatility(data, freq):
     
     cleanData = utils.trimData(data)         
     
-    vol = np.std(cleanData)* np.sqrt(scalingFactor[freq])
+    vol = np.std(cleanData)* np.sqrt(12)
     
     return vol
     
 def VaR(data, horizon, probability):
-    
+# TODO: Checks for invalide probability and horizon
     """ Calculate historical value at risk
     
      For a given return series, horizon, and probability (p), VaR is the threshold 
@@ -88,51 +86,9 @@ def VaR(data, horizon, probability):
     # Calculate annualized rolling returns
     rollingReturns = pd.rolling_apply(cleanData, horizon, lambda x: np.prod(1 + x)**(12/horizon) - 1)
     
-    VaR = np.percentile(rollingReturns.dropna(), 5)
+    VaR = np.percentile(rollingReturns.dropna(), 1 - probability)
     
     return VaR
 
-## Move to utilities
-#def trimData(data):
-#    ''' Function to drop NaN at the beginning and end of a dataframe
-#    
-#    Function will return a data error is there are missing values in the middle    
-#    
-#    '''
-#    # check if there are any NaN values in the middle
-#    if checkSeqentialMonthly(data.dropna()):
-#        
-#        return data.dropna()
-#        
-#    else:
-#        
-#        raise badData('trimData')
-#
-#def checkSeqentialMonthly(data):
-#    
-#    months = data.index.month
-#    years = data.index.year
-#    
-#    monthsDiff = np.mod(months[1:]-months[0:-1],12)
-#    
-#    if all(monthsDiff == 1):
-#    
-#        yearsDiff = years[1:] - years[0:-1]
-#        ix = np.where(yearsDiff == 1)
-#    
-#        if all(months[ix] == 12):
-#            
-#            return True
-#        else:
-#            return False 
-#    else:
-#        return False
-
 if __name__ == "__main__":
-    main()
-    
-
-class badData(Exception):
-    pass
-    
-    
+    main()   

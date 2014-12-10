@@ -2,6 +2,7 @@
 """
 Collection of return metrics to operate on pandas (time)series and dataframes
 
+Author: Peter Li
 """
 
 import pandas as pd
