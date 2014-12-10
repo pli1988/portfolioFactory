@@ -15,6 +15,7 @@ import numpy as np
 import datetime
 import portfolioFactory
 from ..universe import universe as universe
+from ..exceptions.exceptions import *
 
 
 class strategy(object):
@@ -65,7 +66,7 @@ class strategy(object):
         # pull parameters from config file
         self.parameters = self.__setParameters(configPath)
         self.parameters['universe']=universe.parameters['universeName']
-        self._fullReturns = universe.assetReturns.copy()
+        
         
         # verify input
         self.__verifyUserInput(universe)
@@ -106,7 +107,7 @@ class strategy(object):
         try:
             parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
         except IOError:
-            raise InvalidParameterPath
+            raise InvalidParameterPath(configPath)
             
         parameters.columns = ['values']        
         
@@ -136,20 +137,28 @@ class strategy(object):
         # 1) make sure that passed universe is a universe object
         if isinstance(universe,portfolioFactory.universe.universe.universe)==False:
             raise notUniverseObject
+        else:
+            self._fullReturns = universe.assetReturns.copy()
             
         # 2) make sure config file has necessary inputs
-        print self.parameters.keys()
         expectedInputs = ['name','signalPath', 'rule','rebalanceWindow','universe']
+        
+        for inp in expectedInputs:
+            if str(inp) not in self.parameters.keys():
+                raise missingInput(inp) 
+                
         for inp in self.parameters.keys():
             if str(inp) not in expectedInputs:
-                print inp
-                raise missingInput(inp) 
+                raise unexpectedInput(inp)
                 
         # 3) ensure window is numeric
         try:
             self._window = int(self.parameters['rebalanceWindow'])
         except ValueError:
-            raise windowNotInt
+            raise windowNotInt(self._window)
+            
+        if self._window<1:
+            raise windowNegative(self._window)
             
         # 3) ensure rule is numeric
         try:
@@ -169,7 +178,7 @@ class strategy(object):
         try:  
             self._fullSignal = pd.read_pickle(self.parameters['signalPath'])
         except IOError:
-            raise invalidSignalPath
+            raise invalidSignalPath(self.parameters['signalPath'])
             
     
         
@@ -183,7 +192,7 @@ class strategy(object):
         beginOverlap = (self._fullSignal.index).intersection(self._fullReturns.index).min()
         endOverlap = (self._fullSignal.index).intersection(self._fullReturns.index).max()
         if (endOverlap - beginOverlap)<datetime.timedelta(1):
-            print noTimeOverlap
+            raise noTimeOverlap
         
         # obtain overlapping ticker  (ensure intersection exists)
         tickerOverlap = list(set(self._fullSignal.columns).intersection(set(self._fullReturns.columns)))
