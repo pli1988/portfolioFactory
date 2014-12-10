@@ -7,13 +7,13 @@ Created on Wed Dec 10 12:38:21 2014
 
 class invalidParameterPath(Exception) :
         def __init__(self,msg='') :
-            self.m="The specified config file could not be found:"+str(msg)
+            self.m="The specified config path did not return a pickled dataframe:"+str(msg)
         def __str__(self):
             return repr(self.m)
             
 class invalidSignalPath(Exception) :
         def __init__(self,msg='') :
-            self.m="The specified signal file could not be found:"+str(msg)
+            self.m="The specified signal path did not return a pickled dataframe:"+str(msg)
         def __str__(self):
             return repr(self.m)
             
@@ -31,19 +31,19 @@ class unexpectedInput(Exception) :
             
 class windowNotInt(Exception) :
         def __init__(self,msg='') :
-            self.m="Window parameter must be integer: passed"+str(msg)
+            self.m="Window parameter must be integer: passed  "+str(msg)
         def __str__(self):
             return repr(self.m)
 
 class windowNegative(Exception) :
         def __init__(self,msg='') :
-            self.m="Window parameter must be positive: passed"+str(msg)
+            self.m="Window parameter must be positive: passed  "+str(msg)
         def __str__(self):
             return repr(self.m)
             
 class ruleNotInt(Exception) :
         def __init__(self,msg='') :
-            self.m="Rule parameter must be integer: passed"+str(msg)
+            self.m="Rule parameter must be integer: passed  "+str(msg)
         def __str__(self):
             return repr(self.m)
             
@@ -61,9 +61,39 @@ class noTickerOverlap(Exception) :
             
 class notEnoughSignals(Exception) :
         def __init__(self,msg='') :
-            self.m="Signal data does not have enough non-Nan values to make selection at specified rule"
+            self.m="Signal data does not have enough non-Nan values to make selection at specified rule for "+str(msg)+" periods"
         def __str__(self):
             return repr(self.m)
+            
+            
+###################################################
+            
+class notListError(Exception) :
+        def __init__(self,msg='') :
+            self.m="Both strategyPool argument and weights argument must be lists"
+        def __str__(self):
+            return repr(self.m)
+            
+class listMismatchError(Exception) :
+        def __init__(self,msg='') :
+            self.m="strategyPool and weights must contain the same number of elements"
+        def __str__(self):
+            return repr(self.m)
+            
+class notStrategyError(Exception) :
+        def __init__(self,msg='') :
+            self.m="strategyPool must be a list of strategy objects"
+        def __str__(self):
+            return repr(self.m)
+            
+class badWeightError(Exception) :
+        def __init__(self,msg='') :
+            self.m="weights must be a list of numeric weights"
+        def __str__(self):
+            return repr(self.m)
+            
+            
+            
             
             
 

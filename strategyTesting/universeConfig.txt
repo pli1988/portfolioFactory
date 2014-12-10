@@ -1,0 +1,4 @@
+universeName = USEquityUniverse
+totalReturnFilePath = strategyTesting/totalReturnData
+currency = USD
+nanFill = 'ffill'

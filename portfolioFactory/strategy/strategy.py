@@ -164,7 +164,7 @@ class strategy(object):
         try:
             self._rule = int(self.parameters['rule'])
         except ValueError:
-            raise ruleNotInt
+            raise ruleNotInt(self.parameters['rule'])
             
 
         
@@ -223,8 +223,9 @@ class strategy(object):
             mask = ((-1*self.signal).rank(axis=1)<=self._rule)*(self.signal.notnull())
         
         # Check to make sure there are enough non-Nan values
-        if mask.sum(axis=1).sum() < np.abs(self._rule)*mask.shape[0]:
-            raise notEnoughSignals
+        diff = np.abs(self._rule)*mask.shape[0] - mask.sum(axis=1).sum()
+        if diff > 0:
+            raise notEnoughSignals(diff)
             
         self.selection = 1*mask
             
@@ -277,10 +278,13 @@ class strategy(object):
         portValueGlobal=0
         rebalanced = merged.groupby('block').apply(strategy.calcRebalancing,tickers=self._tickers)
          
-        # keep the investment values and total value columns
+        # keep the values of interest and calculate returns
         columnsToKeep = self._tickers[:]
-        columnsToKeep.extend(['block','value'])       
-        self.strategy = rebalanced[columnsToKeep]
+        columnsToKeep.extend(['block','value'])
+        self.values = rebalanced[columnsToKeep]
+        strategyReturns = (self.values).pct_change()['value']
+        strategyReturns.iloc[0]= (self.values.value[0])-1
+        self.strategyReturns = strategyReturns
 
 
 
