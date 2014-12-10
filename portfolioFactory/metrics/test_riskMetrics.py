@@ -112,8 +112,6 @@ class TestRiskMetricsFunctions(unittest.TestCase):
         
         self.assertRaises(customExceptions.invalidInput, riskMetrics.VaR, testSeries, 12, 2)
 
-
-
     def testVaR_ConstantPositive(self):
         # Given constant positive values, vol is 0
         testSeries = self.createMonthlySeries(0.5)
