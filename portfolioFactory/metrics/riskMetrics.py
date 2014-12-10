@@ -1,7 +1,7 @@
 
 """
 
-This module contains a collection of risk metrics to operate on pandas timeseries
+This module contains a collection of risk metrics to operate on Pandas timeseries
 
 Author: Peter Li
 """
@@ -9,6 +9,7 @@ Author: Peter Li
 import pandas as pd
 import numpy as np
 from ..utils import utils as utils
+from ..utils import customExceptions as customExceptions
 
 def main():
     pass
@@ -24,7 +25,7 @@ def maxDrawdown(data):
       
     """    
     
-    cleanData = utils.trimData(data)
+    cleanData = utils.processData(data)
     
     # append zero to return series and compute level
     returns = np.append([0], cleanData.values)
@@ -50,14 +51,13 @@ def annualizedVolatility(data):
       
     """    
     
-    cleanData = utils.trimData(data)         
+    cleanData = utils.processData(data)         
     
     vol = np.std(cleanData)* np.sqrt(12)
     
     return vol
     
 def VaR(data, horizon, probability):
-# TODO: Checks for invalide probability and horizon
     """ Calculate historical value at risk
     
      For a given return series, horizon, and probability (p), VaR is the threshold 
@@ -81,14 +81,20 @@ def VaR(data, horizon, probability):
       
     """  
     
-    cleanData = utils.trimData(data)
-
-    # Calculate annualized rolling returns
-    rollingReturns = pd.rolling_apply(cleanData, horizon, lambda x: np.prod(1 + x)**(12/horizon) - 1)
+    cleanData = utils.processData(data)
     
-    VaR = np.percentile(rollingReturns.dropna(), 1 - probability)
+    if (1<=horizon<=len(cleanData)) & (0<=probability<=100):            
     
-    return VaR
+        # Calculate annualized rolling returns
+        rollingReturns = pd.rolling_apply(cleanData, horizon, lambda x: np.prod(1 + x)**(12/horizon) - 1)
+        
+        VaR = np.percentile(rollingReturns.dropna(), 100 - probability)
+        
+        return VaR
+        
+    else:
+        
+        raise customExceptions.invalidInput('VaR')
 
 if __name__ == "__main__":
     main()   

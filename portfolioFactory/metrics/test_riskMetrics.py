@@ -5,11 +5,8 @@ Author: Peter Li
 
 """
 
-
 import unittest
 import pandas as pd
-import numpy as np
-
 
 import portfolioFactory.metrics.riskMetrics as riskMetrics
 from ..utils import customExceptions as customExceptions
@@ -38,9 +35,15 @@ class TestRiskMetricsFunctions(unittest.TestCase):
 # Test maxDrawdown
 ##############################################################################
 
-    def testDrawdown_validInput(self):
+    def testDrawdown_invalidInput(self):
         # Quick check of data validation, main check will be in test of util.trim
         testSeries = self.createDailySeries(1)
+        
+        self.assertRaises(customExceptions.badData, riskMetrics.maxDrawdown, testSeries)
+
+    def testDrawdown_invalidInputStr(self):
+        # Quick check of data validation, main check will be in test of util.trim
+        testSeries = self.createMonthlySeries('a')
         
         self.assertRaises(customExceptions.badData, riskMetrics.maxDrawdown, testSeries)
         
@@ -69,11 +72,19 @@ class TestRiskMetricsFunctions(unittest.TestCase):
 # Test annualizedVolatility
 ##############################################################################
 
-    def testVol_validInput(self):
+    def testVol_invalidInput(self):
         # Quick check of data validation, main check will be in test of util.trim
         testSeries = self.createDailySeries(1)
         
         self.assertRaises(customExceptions.badData, riskMetrics.annualizedVolatility, testSeries)
+
+
+    def testVol_invalidInputStr(self):
+        # Quick check of data validation, main check will be in test of util.trim
+        testSeries = self.createMonthlySeries('a')
+        
+        self.assertRaises(customExceptions.badData, riskMetrics.annualizedVolatility, testSeries)
+
 
     def testVol_ConstantPositive(self):
         # Given constant positive values, vol is 0
@@ -87,7 +98,6 @@ class TestRiskMetricsFunctions(unittest.TestCase):
 
         self.assertEqual(riskMetrics.annualizedVolatility(testSeries), 0)  
 
-
 ##############################################################################
 # Test VaR
 ##############################################################################
@@ -96,27 +106,31 @@ class TestRiskMetricsFunctions(unittest.TestCase):
         # Quick check of data validation, main check will be in test of util.trim
         testSeries = self.createDailySeries(1)
         
-        self.assertRaises(customExceptions.badData, riskMetrics.VaR, testSeries, 12, 0.9)
+        self.assertRaises(customExceptions.badData, riskMetrics.VaR, testSeries, 12, 90)
 
-# TODO: Fix, Should Fail
+    def testVaR_badDataStr(self):
+        # Quick check of data validation, main check will be in test of util.trim
+        testSeries = self.createDailySeries('a')
+        
+        self.assertRaises(customExceptions.badData, riskMetrics.VaR, testSeries, 12, 90)
+
     def testVaR_badHorizon(self):
         # Quick check of data validation, main check will be in test of util.trim
         testSeries = self.createMonthlySeries(0.5)
         
-        self.assertRaises(customExceptions.invalidInput, riskMetrics.VaR, testSeries, 0.5, 0.9)
+        self.assertRaises(customExceptions.invalidInput, riskMetrics.VaR, testSeries, 0.5, 9)
 
-# TODO: Fix, Should Fail
     def testVaR_badProbability(self):
         # Quick check of data validation, main check will be in test of util.trim
         testSeries = self.createMonthlySeries(0.5)
         
-        self.assertRaises(customExceptions.invalidInput, riskMetrics.VaR, testSeries, 12, 2)
+        self.assertRaises(customExceptions.invalidInput, riskMetrics.VaR, testSeries, 12, 120)
 
     def testVaR_ConstantPositive(self):
         # Given constant positive values, vol is 0
         testSeries = self.createMonthlySeries(0.5)
 
-        self.assertEqual(riskMetrics.VaR(testSeries, 12, 0.9), (1+0.5)**12 -1)    
+        self.assertEqual(riskMetrics.VaR(testSeries, 12, 90), (1+0.5)**12 -1)    
  
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestRiskMetricsFunctions)

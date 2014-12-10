@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Collection of return metrics to operate on pandas (time)series and dataframes
+Collection of return metrics to operate on Pandas timeseries
 
 Author: Peter Li
 """
@@ -26,9 +26,11 @@ def averageHorizonReturn(data, horizon):
     
     '''
     
-    if 1<=horizon<=len(data):    
+    cleanData = utils.processData(data) 
     
-        return np.mean(rollingReturn(data, horizon))
+    if 1<=horizon<=len(cleanData):    
+    
+        return np.mean(rollingReturn(cleanData, horizon))
     else:
         raise customExceptions.invalidInput('averageHorizonReturn') 
         
@@ -37,13 +39,13 @@ def cumulativeReturn(data):
     
     '''Calculate cumulative return'''
     
-    cleanData = utils.trimData(data)    
+    cleanData = utils.processData(data)    
     
     return np.prod(1 + cleanData) - 1    
 
 def rollingReturn(data, horizon):
     
-    cleanData = utils.trimData(data)
+    cleanData = utils.processData(data)
     
     if 1<=horizon<=len(cleanData):    
 

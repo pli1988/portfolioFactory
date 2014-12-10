@@ -8,11 +8,12 @@ Created on Mon Dec  8 22:09:49 2014
 import numpy as np
 from . import customExceptions
 
-# Move to utilities
-def trimData(data):
-    """ Function to drop leading and trailing NaN for timeseries
+def processData(data):
+    """ Function to process timeseries data
     
-    trimData will return an error if there are NaN's in the middle of the series    
+    processData performs 2 steps:
+        - check if data is numeric, monthly with no missing values (NaN in the middle)
+        - drop leading and trailng NaN
     
     Args:
         - data (Pandas time series): monthly timeseries
@@ -23,10 +24,23 @@ def trimData(data):
     """    
     
     # check if there are any NaN values in the middle
-    if checkSeqentialMonthly(data.dropna().index):
-        return data.dropna()
+    
+    tempData = data.dropna()
+    
+    # check if monthly    
+    if checkSeqentialMonthly(tempData.index):
+        
+        # check values are numeric
+        if all([isinstance(x,(float, int, long)) for x in tempData.values]):
+
+            return tempData
+            
+        else:
+            
+            raise customExceptions.badData('non-numeric data found')
     else:
-        raise customExceptions.badData('trimData')
+        
+        raise customExceptions.badData('missing data found')
 
 def checkSeqentialMonthly(index):
     """ Function to check if dates for data timeseries are sequential
@@ -48,15 +62,20 @@ def checkSeqentialMonthly(index):
     
     # If months are sequential    
     if all(monthsDiff == 1):
+        
         yearsDiff = years[1:] - years[0:-1]
         ix = np.where(yearsDiff == 1)
         
         # If years are sequential
-        if all(months[ix] == 12):        
+        if all(months[ix] == 12):      
+            
             return True        
+
         else:        
+
             return False        
     else:    
+
         return False
     
 

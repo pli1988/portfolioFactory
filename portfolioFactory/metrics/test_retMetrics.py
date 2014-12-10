@@ -1,15 +1,21 @@
 """
-Author: Peter Li
+
+unit tests for retMetrics module
+
+Note: data validation only checks with misspecified frequency i.e. annual data
+more validation checks take place in unit test for utils
+
+
+To run all test:
 
 >> python -m unittest discover
 
-"""
+Author: Peter Li
 
+"""
 
 import unittest
 import pandas as pd
-import numpy as np
-
 
 import portfolioFactory.metrics.retMetrics as retMetrics
 from ..utils import customExceptions as customExceptions
@@ -23,13 +29,13 @@ class TestRetMetricsFunctions(unittest.TestCase):
         self.dayRange = pd.date_range('1/1/1990', periods=20, freq='d')
         
     def createMonthlySeries(self, value):
-        
+        # Function to create monthly series
         constSeries = pd.Series(value, index = self.monthRange)        
     
         return constSeries
         
     def createDailySeries(self, value):
-    
+        # Function to create daily series
         constSeries = pd.Series(value, index = self.dayRange)        
 
         return constSeries
@@ -44,6 +50,13 @@ class TestRetMetricsFunctions(unittest.TestCase):
         
         self.assertRaises(customExceptions.badData, retMetrics.averageHorizonReturn, testSeries, 12)
 
+    def testaverageHorizonReturn_badDataStr(self):
+        # Quick check of data validation, main check will be in test of util.trim
+        testSeries = self.createMonthlySeries('a')
+        
+        self.assertRaises(customExceptions.badData, retMetrics.averageHorizonReturn, testSeries, 12)
+
+
     def testaverageHorizonReturn_badHorizon(self):
         # Quick check of data validation, main check will be in test of util.trim
         testSeries = self.createMonthlySeries(0.5)
@@ -57,11 +70,9 @@ class TestRetMetricsFunctions(unittest.TestCase):
         self.assertEqual(retMetrics.averageHorizonReturn(testSeries,1), 0.5)
         self.assertEqual(retMetrics.averageHorizonReturn(testSeries,5), (1+0.5)**5 -1)
 
-
 ##############################################################################
 # Test cumulativeReturn
 ##############################################################################
-
 
     def testcumulativeReturn_invalidInput(self):
         # Quick check of data validation, main check will be in test of util.trim
