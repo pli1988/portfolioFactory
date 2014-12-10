@@ -1,0 +1,4 @@
+name = USEquityStrategy
+signalPath = testSignal01
+rule = 300
+rebalanceWindow = 12

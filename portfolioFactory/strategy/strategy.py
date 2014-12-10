@@ -12,9 +12,10 @@ Created on Sat Dec 06 15:27:38 2014
 
 import pandas as pd
 import numpy as np
+import datetime
+import portfolioFactory
+from ..universe import universe as universe
 
-
-testStrategy = strategy(usEqUniverse,'strategyConfig.txt')
 
 class strategy(object):
 
@@ -38,11 +39,10 @@ class strategy(object):
         
         Parameters Dictionary:
         - universe: the name of universe object on which the strategy is defined
-        - signalName: the signal used to generate the strategy 
+        - signalPath: path to pickled dataframe with signal data
         - rule: the cutoff point for selecting investments
         - window: size of window between rebalancing 
-        - startDate: starting date for strategy
-        - endDate: ending date for strategy
+
     '''
     
     
@@ -51,7 +51,7 @@ class strategy(object):
         ''' Method to intialize a strategy object
         
             1) Reads in parameters from configPath      
-            2) Calculates signal and sets as attribute
+            2) Sets signal as attribute
             3) Selects investments based on signal and sets as attribute
             4) Calculates weights ands sets as attribute
             5) Calculates strategy values and sets as attribute
@@ -62,40 +62,37 @@ class strategy(object):
           
         '''
         
-        # pull parameters from config file 
+        # pull parameters from config file
         self.parameters = self.__setParameters(configPath)
         self.parameters['universe']=universe.parameters['universeName']
+        self._fullReturns = universe.assetReturns.copy()
         
-        # set private attributes used for calculations
-        self._signalType = self.parameters['signalType']
-        self._rule = int(self.parameters['rule'])
-        self._window = int(self.parameters['window'])
-        self._startDate = self.parameters['startDate']
-        self._endDate = self.parameters['endDate']
-        self._tickers = universe.assetReturns.columns.values
-        self._returns = universe.assetReturns.copy()
-        self._dates = self._returns[self._startDate : self._endDate].index
-        self._rebalanceDates = self._dates[::self._window]
+        # verify input
+        self.__verifyUserInput(universe)
         
-        # set attributes
+        # pull signal data
         self.__setSignal()
+        
+        # check date overlap between returns and signal data
+        self.__checkOverlap() 
+        
+        # set attributes 
         self.__setSelection()
         self.__setWeights()
         self.__setStrategy()
         
+
         
-        # TODO: Add checks for if file exists     
     def __setParameters(self, configPath):
         """ Method to read config file
         
         Note:
             configPath is assumed to be a .txt file with (at least) the following fields:
               - name : a name/description for the strategy
-              - signalType: signal type used for selecting investments (ex. 'rollingReturns')
+              - signalPath: signal data location 
               - rule: the cutoff point for selecting investment (positive/negative int-->pick top/bottom S investments)
               - window: time-span between rebalancing
-              - startDate: strategy starting date
-              - endDate: strategy ending date
+
         
         Args:
             configPath (str): location of config file
@@ -105,8 +102,12 @@ class strategy(object):
             
         """
         
-        # Load Data
-        parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
+        # Load Parameters Data
+        try:
+            parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
+        except IOError:
+            raise InvalidParameterPath
+            
         parameters.columns = ['values']        
         
         # Strip spaces
@@ -116,17 +117,85 @@ class strategy(object):
         
         return parameters.to_dict()
         
+        '''       
+    def getTickers(self):
+            
+        tickerPath = self.parameters['tickerPath']
+               
+        with open(tickerPath, 'r') as f:
+                tickers = f.read()
+                              
+        tickers = tickers.strip().split(',')
+        tickers = map(str.strip,tickers)
+        return tickers    
+        '''      
+
+    def __verifyUserInput(self,universe):
         
+        
+        # 1) make sure that passed universe is a universe object
+        if isinstance(universe,portfolioFactory.universe.universe.universe)==False:
+            raise notUniverseObject
+            
+        # 2) make sure config file has necessary inputs
+        print self.parameters.keys()
+        expectedInputs = ['name','signalPath', 'rule','rebalanceWindow','universe']
+        for inp in self.parameters.keys():
+            if str(inp) not in expectedInputs:
+                print inp
+                raise missingInput(inp) 
+                
+        # 3) ensure window is numeric
+        try:
+            self._window = int(self.parameters['rebalanceWindow'])
+        except ValueError:
+            raise windowNotInt
+            
+        # 3) ensure rule is numeric
+        try:
+            self._rule = int(self.parameters['rule'])
+        except ValueError:
+            raise ruleNotInt
+            
+
         
         
     def __setSignal(self):
         """ Method to set self.signal
         
+            Note: signal data must be a pickled pandas dataframe
+        
+        """
+        try:  
+            self._fullSignal = pd.read_pickle(self.parameters['signalPath'])
+        except IOError:
+            raise invalidSignalPath
+            
+    
+        
+    def __checkOverlap(self):
+        """ Method to extract overlap between signal and assetReturns data
+        
+            Note: Method also ensures that there is sufficient overlap in terms of tickers and dates
         """
         
-        if self._signalType=='rollingRet':
-            self.signal = strategy.calcRollRet(self._returns,self._window).ix[self._rebalanceDates][self._tickers]
-      
+        # obtain dates of overlap (ensure intersection exists)
+        beginOverlap = (self._fullSignal.index).intersection(self._fullReturns.index).min()
+        endOverlap = (self._fullSignal.index).intersection(self._fullReturns.index).max()
+        if (endOverlap - beginOverlap)<datetime.timedelta(1):
+            print noTimeOverlap
+        
+        # obtain overlapping ticker  (ensure intersection exists)
+        tickerOverlap = list(set(self._fullSignal.columns).intersection(set(self._fullReturns.columns)))
+        if len(tickerOverlap)==0:
+            raise noTickerOverlap
+        
+        self._tickers = tickerOverlap
+        self._returns = self._fullReturns.ix[beginOverlap:endOverlap][self._tickers]
+        self._rebalanceDates = self._returns.index[::self._window]
+        self.signal = self._fullSignal.ix[self._rebalanceDates][self._tickers]
+                
+ 
 
 
       
@@ -146,7 +215,7 @@ class strategy(object):
         
         # Check to make sure there are enough non-Nan values
         if mask.sum(axis=1).sum() < np.abs(self._rule)*mask.shape[0]:
-            print "Israel will add an error here"
+            raise notEnoughSignals
             
         self.selection = 1*mask
             
@@ -156,6 +225,7 @@ class strategy(object):
             
     def __setWeights(self):
         """ Method to set self.weights
+        
         
             Note: normalizes so that the weights for each day sum to 1
         
@@ -185,9 +255,9 @@ class strategy(object):
         weights['rebalance'] = 1
          
         # merge the returns dataframe with the weights dataframe and forward fill weight data
-        merged = pd.merge(self._returns[self._startDate:self._endDate],weights,how='left',left_index=True,right_index=True,suffixes=['_r','_w'])
+        merged = pd.merge(self._returns,weights,how='left',left_index=True,right_index=True,suffixes=['_r','_w'])
         merged['block'] = None
-        merged['block'][merged.rebalance==1] = np.arange((merged.rebalance==1).sum())
+        merged.loc[merged.rebalance==1,['block']] = np.arange((merged.rebalance==1).sum())
         merged['block'] = merged['block'].fillna(method='ffill')
         merged = merged.drop('rebalance',axis=1)
         merged[weightTickers] = merged[weightTickers].fillna(method='ffill')
@@ -199,38 +269,9 @@ class strategy(object):
         rebalanced = merged.groupby('block').apply(strategy.calcRebalancing,tickers=self._tickers)
          
         # keep the investment values and total value columns
-        columnsToKeep = self._tickers.tolist()[:]
-        columnsToKeep.append('block')
-        columnsToKeep.append('value')
+        columnsToKeep = self._tickers[:]
+        columnsToKeep.extend(['block','value'])       
         self.strategy = rebalanced[columnsToKeep]
-
-
-
-
-
-    @ staticmethod        
-    # will be moved to util
-    def calcRollRet(returns,spansize):
-        ''' Returns spansize-window rolling returns.
-        
-        Note:
-            Assumes returns are in decimal form (ex. 0.02 is a 2% return)
-            If any of the data points within the window are NaN, then value for entire window is NaN
-        
-        Args:
-            returns (dataframe): dataframe containing returns data
-            spansize (int): size of rolling-window
-        
-        Returns:
-            A dataframe with spansize-window rolling returns
-            
-        ''' 
-        
-        rollRet = (pd.rolling_apply(1+returns,window=int(spansize),func=np.prod) - 1)
-        filterMissing = pd.rolling_count(returns,int(spansize))==int(spansize)
-        rollRetClean = rollRet * (1*filterMissing)
-        return rollRetClean
-
 
 
 
@@ -252,7 +293,7 @@ class strategy(object):
             portValueGlobal=1
         else:
             portValueGlobal = df['value'].iloc[-1]
-        print df
+        #print df
         return df
 
 

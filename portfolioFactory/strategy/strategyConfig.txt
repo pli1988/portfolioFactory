@@ -1,6 +1,0 @@
-name = USEquityStrategy
-signalType = rollingRet
-rule = 2
-window = 8
-startDate = 1/1/2010 
-endDate = 6/1/2012
