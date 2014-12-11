@@ -22,11 +22,17 @@ from portfolioFactory.utils import getFileLocation
 #usEqUniverse = universe.universe('portfolioFactory/universe/usEquityConfig.txt')
 
 
-usEqUniverse = universe.universe('testUniverse')
+assetReturnsPath = getFileLocation.getFileLocation()
+
 
 #configFilePath = getFileLocation.getFileLocation()
 
+
+assetReturnsPath = '/home/peter/Documents/Homework/ProgrammingForDatascience/finalProject2/portfolioFactory/portfolioFactory/universe/totalReturnData' 
 configFilePath = '/home/peter/Documents/Homework/ProgrammingForDatascience/finalProject2/portfolioFactory/portfolioFactory/strategy/SampleFiles/strategyConfig_1_5.txt'
+
+
+usEqUniverse = universe.universe('testUniverse', assetReturnsPath)
 testStrategy = strategy.strategy(usEqUniverse, configFilePath)
 testPortfolio =  portfolio.portfolio([testStrategy],[1])
 
