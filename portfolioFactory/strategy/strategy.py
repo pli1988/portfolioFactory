@@ -14,7 +14,7 @@ import pandas as pd
 import numpy as np
 import datetime
 import portfolioFactory
-from ..utils.customExceptions import *
+from ..utils import customExceptions as customExceptions
 from ..utils.utils import setParameters
 
 
@@ -107,7 +107,7 @@ class strategy(object):
         try:
             parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
         except IOError:
-            raise InvalidParameterPath(configPath)
+            raise customExceptions.InvalidParameterPath(configPath)
             
         parameters.columns = ['values']        
         
@@ -124,7 +124,7 @@ class strategy(object):
         
         # 1) make sure that passed universe is a universe object
         if isinstance(universe,portfolioFactory.universe.universe.universe)==False:
-            raise notUniverseObject
+            raise customExceptions.notUniverseObject
         else:
             self._fullReturns = universe.assetReturns.copy()
             
@@ -133,26 +133,26 @@ class strategy(object):
         
         for inp in expectedInputs:
             if str(inp) not in self.parameters.keys():
-                raise missingInput(inp) 
+                raise customExceptions.missingInput(inp) 
                 
         for inp in self.parameters.keys():
             if str(inp) not in expectedInputs:
-                raise unexpectedInput(inp)
+                raise customExceptions.unexpectedInput(inp)
                 
         # 3) ensure window is numeric
         try:
             self._window = int(self.parameters['rebalanceWindow'])
         except ValueError:
-            raise windowNotInt()
+            raise customExceptions.windowNotInt()
             
         if self._window<1:
-            raise windowNegative(self._window)
+            raise customExceptions.windowNegative(self._window)
             
         # 3) ensure rule is numeric
         try:
             self._rule = int(self.parameters['rule'])
         except ValueError:
-            raise ruleNotInt(self.parameters['rule'])
+            raise customExceptions.ruleNotInt(self.parameters['rule'])
             
 
         
@@ -166,7 +166,7 @@ class strategy(object):
         try:  
             self._fullSignal = pd.read_pickle(self.parameters['signalPath'])
         except IOError:
-            raise invalidSignalPath(self.parameters['signalPath'])
+            raise customExceptions.invalidSignalPath(self.parameters['signalPath'])
             
     
         
@@ -180,12 +180,12 @@ class strategy(object):
         beginOverlap = (self._fullSignal.index).intersection(self._fullReturns.index).min()
         endOverlap = (self._fullSignal.index).intersection(self._fullReturns.index).max()
         if isinstance(beginOverlap,pd.tslib.NaTType) or isinstance(beginOverlap,pd.tslib.NaTType):
-            raise noTimeOverlap
+            raise customExceptions.noTimeOverlap
         
         # obtain overlapping ticker  (ensure intersection exists)
         tickerOverlap = list(set(self._fullSignal.columns).intersection(set(self._fullReturns.columns)))
         if len(tickerOverlap)==0:
-            raise noTickerOverlap
+            raise customExceptions.noTickerOverlap
         
         self._tickers = tickerOverlap
         self._returns = self._fullReturns.ix[beginOverlap:endOverlap][self._tickers]
@@ -213,7 +213,7 @@ class strategy(object):
         # Check to make sure there are enough non-Nan values
         diff = np.abs(self._rule)*mask.shape[0] - mask.sum(axis=1).sum()
         if diff > 0:
-            raise notEnoughSignals(diff)
+            raise customExceptions.notEnoughSignals(diff)
             
         self.selection = 1*mask
             

@@ -6,7 +6,7 @@ Created on Thu Dec 11 12:53:26 2014
 """
 import numpy as np
 import pandas as pd
-from .customExceptions import *
+from . import customExceptions
 
 def setParameters(configPath):
         """ Function to read config file
@@ -31,7 +31,7 @@ def setParameters(configPath):
         try:
             parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
         except IOError:
-            raise invalidParameterPath(configPath)
+            raise customExceptions.invalidParameterPath(configPath)
             
         parameters.columns = ['values']        
         
@@ -56,6 +56,16 @@ def calcRollingReturns(df,window):
         Returns
         - pandas dataframe with rolling returns
     '''
-
+    #ensure parameters are specified correctly
+    if type(df)!=pd.DataFrame:
+        raise customExceptions.notDFError
+    
+    if type(window)!=int:
+        raise customExceptions.windowNotInt
+    
+    if window<1:
+        raise customExceptions.windowNegative
+    
+        
     return (pd.rolling_apply(1+df,window=window,func=np.prod,min_periods=window) - 1)
       

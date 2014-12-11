@@ -92,6 +92,14 @@ class badWeightError(Exception) :
         def __str__(self):
             return repr(self.m)
             
+######################################################
+            
+class notDFError(Exception) :
+        def __init__(self,msg='') :
+            self.m="First input must be a pandas dataframe"
+        def __str__(self):
+            return repr(self.m)    
+            
             
             
             
