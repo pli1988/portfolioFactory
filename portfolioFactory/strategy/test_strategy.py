@@ -9,12 +9,9 @@
     
 import pandas as pd
 import numpy as np
-import portfolioFactory
 from portfolioFactory.universe import universe as universe
 from portfolioFactory.strategy import strategy as strategy
 from portfolioFactory.utils.utils import calcRollingReturns as calcRollingReturns
-from portfolioFactory.utils.utils import setParameters as setParameters
-from portfolioFactory.exceptions.exceptions import *
 
 location = "portfoliofactory/strategy/SampleFiles/"
 
