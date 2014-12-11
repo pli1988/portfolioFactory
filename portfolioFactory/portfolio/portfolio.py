@@ -6,7 +6,7 @@ import numpy as np
 import datetime
 import portfolioFactory
 from ..strategy import strategy as strategy
-from ..exceptions.exceptions import *
+from ..utils.customExceptions import *
 
 class portfolio(object):
     

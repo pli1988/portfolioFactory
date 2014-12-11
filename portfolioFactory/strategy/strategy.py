@@ -14,8 +14,8 @@ import pandas as pd
 import numpy as np
 import datetime
 import portfolioFactory
-from ..exceptions.exceptions import *
-from ..utils.setParameters import setParameters
+from ..utils.customExceptions import *
+from ..utils.utils import setParameters
 
 
 class strategy(object):
@@ -143,7 +143,7 @@ class strategy(object):
         try:
             self._window = int(self.parameters['rebalanceWindow'])
         except ValueError:
-            raise windowNotInt(self._window)
+            raise windowNotInt()
             
         if self._window<1:
             raise windowNegative(self._window)
@@ -179,7 +179,6 @@ class strategy(object):
         # obtain dates of overlap (ensure intersection exists)
         beginOverlap = (self._fullSignal.index).intersection(self._fullReturns.index).min()
         endOverlap = (self._fullSignal.index).intersection(self._fullReturns.index).max()
-        print type(beginOverlap)
         if isinstance(beginOverlap,pd.tslib.NaTType) or isinstance(beginOverlap,pd.tslib.NaTType):
             raise noTimeOverlap
         

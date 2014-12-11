@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Dec 10 22:30:17 2014
+Created on Thu Dec 11 12:53:26 2014
 
 @author: Israel
 """
+import numpy as np
 import pandas as pd
-from ..exceptions.exceptions import *
+from .customExceptions import *
 
 def setParameters(configPath):
         """ Function to read config file
@@ -30,7 +31,7 @@ def setParameters(configPath):
         try:
             parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
         except IOError:
-            raise InvalidParameterPath(configPath)
+            raise invalidParameterPath(configPath)
             
         parameters.columns = ['values']        
         
@@ -40,3 +41,21 @@ def setParameters(configPath):
         parameters = parameters['values'].map(str.strip)
         
         return parameters.to_dict()
+        
+        
+        
+def calcRollingReturns(df,window):
+    ''' Function to calculate window-size rolling returns
+    
+        Note: assumes returns are in decimal form (ex. 0.02 represents 2%)
+    
+        Arguments:
+        - df (dataframe) : returns matrix (tickers as columns)
+        - window (int) : specifies size of rolling window
+        
+        Returns
+        - pandas dataframe with rolling returns
+    '''
+
+    return (pd.rolling_apply(1+df,window=window,func=np.prod,min_periods=window) - 1)
+      
