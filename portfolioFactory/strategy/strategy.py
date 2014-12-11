@@ -7,15 +7,15 @@ Created on Sat Dec 06 15:27:38 2014
 
 
 # TODO: Add Checks
-# TODO: Add summary  
-# TODO: handle if first window data is missing 
+# TODO: Add summary
+# TODO: handle if first window data is missing
 
 import pandas as pd
 import numpy as np
 import datetime
 import portfolioFactory
-from ..universe import universe as universe
 from ..exceptions.exceptions import *
+from ..utils.setParameters import setParameters
 
 
 class strategy(object):
@@ -64,7 +64,7 @@ class strategy(object):
         '''
         
         # pull parameters from config file
-        self.parameters = self.__setParameters(configPath)
+        self.parameters = setParameters(configPath)
         self.parameters['universe']=universe.parameters['universeName']
         
         
@@ -84,7 +84,7 @@ class strategy(object):
         
 
         
-    def __setParameters(self, configPath):
+    def setParameters(configPath):
         """ Method to read config file
         
         Note:
@@ -117,19 +117,7 @@ class strategy(object):
         parameters = parameters['values'].map(str.strip)
         
         return parameters.to_dict()
-        
-        '''       
-    def getTickers(self):
-            
-        tickerPath = self.parameters['tickerPath']
-               
-        with open(tickerPath, 'r') as f:
-                tickers = f.read()
-                              
-        tickers = tickers.strip().split(',')
-        tickers = map(str.strip,tickers)
-        return tickers    
-        '''      
+          
 
     def __verifyUserInput(self,universe):
         
@@ -191,7 +179,8 @@ class strategy(object):
         # obtain dates of overlap (ensure intersection exists)
         beginOverlap = (self._fullSignal.index).intersection(self._fullReturns.index).min()
         endOverlap = (self._fullSignal.index).intersection(self._fullReturns.index).max()
-        if (endOverlap - beginOverlap)<datetime.timedelta(1):
+        print type(beginOverlap)
+        if isinstance(beginOverlap,pd.tslib.NaTType) or isinstance(beginOverlap,pd.tslib.NaTType):
             raise noTimeOverlap
         
         # obtain overlapping ticker  (ensure intersection exists)
@@ -216,11 +205,11 @@ class strategy(object):
         """
         
         # Case 1: cutoff rule is positive
-        if self._rule>0:
-            mask = (self.signal.rank(axis=1)<=self._rule)*(self.signal.notnull())
+        if self._rule > 0:
+            mask = self.signal.rank(axis=1)<=(self._rule)*(self.signal.notnull())
         # Case 2: cutoff rule is negative    
-        if self._rule>0:
-            mask = ((-1*self.signal).rank(axis=1)<=self._rule)*(self.signal.notnull())
+        if self._rule < 0:
+            mask = (-1*self.signal).rank(axis=1)<=(self._rule)*(self.signal.notnull())
         
         # Check to make sure there are enough non-Nan values
         diff = np.abs(self._rule)*mask.shape[0] - mask.sum(axis=1).sum()
