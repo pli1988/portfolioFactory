@@ -65,7 +65,7 @@ class strategy(object):
         
         # pull parameters from config file
         self.parameters = setParameters(configPath)
-        self.parameters['universe']=universe.name
+        self.parameters['universe']=universe.parameters['universeName']
         
         
         # verify input

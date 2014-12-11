@@ -1,127 +1,47 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec  8 22:09:49 2014
+Created on Thu Dec 11 12:53:26 2014
 
-Author: Peter Li and Israel
+@author: Israel
 """
-
 import numpy as np
 import pandas as pd
 from . import customExceptions
 
-
-def processData(data):
-    """ Function to process timeseries data
-    
-    processData performs 2 steps:
-        - check if data is numeric, monthly with no missing values (NaN in the middle)
-        - drop leading and trailng NaN
-    
-    Args:
-        - data (Pandas time series): monthly timeseries
-    
-    Returns:
-        Trimmed time series        
+def setParameters(configPath):
+        """ Function to read config file
         
-    """    
-    
-    # check if there are any NaN values in the middle
-    
-    tempData = data.dropna()
-    
-    # check if monthly    
-    if checkSeqentialMonthly(tempData.index):
-        
-        # check values are numeric
-        if all([isinstance(x,(float, int, long)) for x in tempData.values]):
+        Note:
+            configPath is assumed to be a .txt file with (at least) the following fields:
+              - name : a name/description for the strategy
+              - signalPath: signal data location 
+              - rule: the cutoff point for selecting investment (positive/negative int-->pick top/bottom S investments)
+              - window: time-span between rebalancing
 
-            return tempData
+        
+        Args:
+            configPath (str): location of config file
+          
+        Returns:
+            A dict with {key = parameter name: value = parameter value} 
             
-        else:
-            
-            raise customExceptions.badData('non-numeric data found')
-    else:
+        """
         
-        raise customExceptions.badData('missing data found')
-
-def checkSeqentialMonthly(index):
-    """ Function to check if dates for data timeseries are sequential
-    
-    Args:
-        - data (Pandas time series): timeseries index
-    
-    Returns:
-        True / False
-        
-    """    
-    
-    # Array of Months and Years
-    months = index.month
-    years = index.year
-    
-    # Difference in months % 12 -- this value should always be 1
-    monthsDiff = np.mod(months[1:]-months[0:-1],12)
-    
-    # If months are sequential    
-    if all(monthsDiff == 1):
-        
-        yearsDiff = years[1:] - years[0:-1]
-        ix = np.where(yearsDiff == 1)
-        
-<<<<<<< HEAD
         # Load Parameters Data
         try:
             parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
         except IOError:
             raise customExceptions.invalidParameterPath(configPath)
-=======
-        # If years are sequential
-        if all(months[ix] == 12):      
->>>>>>> origin/pliDEV
             
-            return True        
-
-        else:        
-
-            return False        
-    else:    
+        parameters.columns = ['values']        
         
-            return False
-
-def setParameters(configPath):
-    """ Function to read config file
-    
-    Note:
-        configPath is assumed to be a .txt file with (at least) the following fields:
-          - name : a name/description for the strategy
-          - signalPath: signal data location 
-          - rule: the cutoff point for selecting investment (positive/negative int-->pick top/bottom S investments)
-          - window: time-span between rebalancing
-
-    
-    Args:
-        configPath (str): location of config file
-      
-    Returns:
-        A dict with {key = parameter name: value = parameter value} 
+        # Strip spaces
+        parameters = parameters.astype('string')        
+        parameters.index = parameters.index.map(str.strip)        
+        parameters = parameters['values'].map(str.strip)
         
-    """
-    
-    # Load Parameters Data
-    try:
-        parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
-    except IOError:
-        raise invalidParameterPath(configPath)
+        return parameters.to_dict()
         
-    parameters.columns = ['values']        
-    
-    # Strip spaces
-    parameters = parameters.astype('string')        
-    parameters.index = parameters.index.map(str.strip)        
-    parameters = parameters['values'].map(str.strip)
-    
-    return parameters.to_dict()
-    
         
         
 def calcRollingReturns(df,window):
@@ -136,7 +56,6 @@ def calcRollingReturns(df,window):
         Returns
         - pandas dataframe with rolling returns
     '''
-<<<<<<< HEAD
     #ensure parameters are specified correctly
     if type(df)!=pd.DataFrame:
         raise customExceptions.notDFError
@@ -148,10 +67,5 @@ def calcRollingReturns(df,window):
         raise customExceptions.windowNegative
     
         
-=======
-    
->>>>>>> origin/pliDEV
     return (pd.rolling_apply(1+df,window=window,func=np.prod,min_periods=window) - 1)
       
-
-

@@ -4,17 +4,17 @@
 ## What is it
 
 **portfolioFactory** is a Python package that streamlines the process for constructing asset pricing factors.
-Built on top of **Pandas**, this package builds portfolios based on user supplied signals and trading rules.
-See strategy class documentation for more details.
+Built on top of **Pandas**, this package blah blah blah.
+
 
 ## Main Features
 Here are just a few of the things that **portfolioFactory** does well:
 
-  - Construction of asset pricing factors e.g. [**cross-sectional momentum portfolios**][momentum] 
+  - Construction of [**cross-sectional momentum portfolios**][momentum] 
 
-  - Calculating risk and return metrics
+  - Feature 1
   
-  - Plotting
+  - Feature 2
 
 
    [momentum]: http://faculty.chicagobooth.edu/tobias.moskowitz/research/JF_12021_TMcomments.pdf
@@ -26,13 +26,15 @@ Here
 - [NumPy](http://www.numpy.org): 1.7.0 or higher
 - [SciPy](http://www.scipy.org): miscellaneous statistical functions
 - [matplotlib](http://matplotlib.sourceforge.net/): for plotting
-- [Pandas](http://pandas.pydata.org/): 0.15.1
-- [TkInter] (http://tkinter.unpythonic.net/wiki/How_to_install_Tkinter): User Interface
+- [Pandas] (http://pandas.pydata.org/)
 
 ### Highly Recommended Dependencies
-- [Seaborn](http://stanford.edu/~mwaskom/software/seaborn/)
+- [Seaborn](https://github.com/pydata/numexpr)
    - Needed to for pretty plots
    - Required for plotting module 
+
+### Optional dependencies
+- [Cython](http://www.cython.org): Only necessary to build development version. Version 0.17.1 or higher.
 
 ## License
 MIT
