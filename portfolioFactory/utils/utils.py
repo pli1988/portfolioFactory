@@ -2,12 +2,13 @@
 """
 Created on Mon Dec  8 22:09:49 2014
 
-@author: peter
+Author: Peter Li and Israel
 """
 
 import numpy as np
 from . import customExceptions
 from .customExceptions import *
+import pandas as pd
 
 def processData(data):
     """ Function to process timeseries data
@@ -80,39 +81,39 @@ def checkSeqentialMonthly(index):
             return False
 
 def setParameters(configPath):
-        """ Function to read config file
-        
-        Note:
-            configPath is assumed to be a .txt file with (at least) the following fields:
-              - name : a name/description for the strategy
-              - signalPath: signal data location 
-              - rule: the cutoff point for selecting investment (positive/negative int-->pick top/bottom S investments)
-              - window: time-span between rebalancing
+    """ Function to read config file
+    
+    Note:
+        configPath is assumed to be a .txt file with (at least) the following fields:
+          - name : a name/description for the strategy
+          - signalPath: signal data location 
+          - rule: the cutoff point for selecting investment (positive/negative int-->pick top/bottom S investments)
+          - window: time-span between rebalancing
 
+    
+    Args:
+        configPath (str): location of config file
+      
+    Returns:
+        A dict with {key = parameter name: value = parameter value} 
         
-        Args:
-            configPath (str): location of config file
-          
-        Returns:
-            A dict with {key = parameter name: value = parameter value} 
-            
-        """
+    """
+    
+    # Load Parameters Data
+    try:
+        parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
+    except IOError:
+        raise invalidParameterPath(configPath)
         
-        # Load Parameters Data
-        try:
-            parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
-        except IOError:
-            raise invalidParameterPath(configPath)
-            
-        parameters.columns = ['values']        
-        
-        # Strip spaces
-        parameters = parameters.astype('string')        
-        parameters.index = parameters.index.map(str.strip)        
-        parameters = parameters['values'].map(str.strip)
-        
-        return parameters.to_dict()
-        
+    parameters.columns = ['values']        
+    
+    # Strip spaces
+    parameters = parameters.astype('string')        
+    parameters.index = parameters.index.map(str.strip)        
+    parameters = parameters['values'].map(str.strip)
+    
+    return parameters.to_dict()
+    
         
         
 def calcRollingReturns(df,window):
@@ -127,9 +128,8 @@ def calcRollingReturns(df,window):
         Returns
         - pandas dataframe with rolling returns
     '''
-
+    
     return (pd.rolling_apply(1+df,window=window,func=np.prod,min_periods=window) - 1)
       
 
 
-    

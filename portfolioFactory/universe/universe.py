@@ -30,6 +30,7 @@ class universe(object):
         '''
 
         filePath = getFileLocation.getFileLocation()
+        self.name = name
         
         try:
             self.filePath = filePath 
@@ -53,7 +54,7 @@ class universe(object):
             
             # Checks if read file meets criteria
             if self.checkData(data):
-                self.assetReturn = data
+                self.assetReturns = data
             else:
                 raise customExceptions.badData('Pickled file is not a proper Dataframe')
         except:
@@ -67,7 +68,7 @@ class universe(object):
         
         """        
         
-        self.tickers = self.assetReturn.columns.values
+        self.tickers = self.assetReturns.columns.values
 
     def computeSummary(self):
         """ Method to compute summary statistics for return dataframe
@@ -81,7 +82,7 @@ class universe(object):
                 - standard deviation (unadjusted)        
         """
         
-        df = self.assetReturns        
+        df = self.assetReturns
         
         # Summary statistiscs
         summary = df.describe()
