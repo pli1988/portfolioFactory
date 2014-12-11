@@ -1,0 +1,4 @@
+name = USEquityStrategy
+signalPath = portfoliofactory/strategy/SampleFiles/signal_1_5_late
+rule = 2
+

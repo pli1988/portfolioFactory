@@ -3,6 +3,7 @@ EXAMPLE: Working with the uiverse class
 """
 
 from universe import universe
+import pandas as pd
 
 # Create Instance of universe for US Equities
 usEqUniverse = universe('usEquityConfig.txt')
@@ -11,4 +12,4 @@ usEqUniverse = universe('usEquityConfig.txt')
 usEqUniverse.computeSummary()
 
 # Plot Return
-usEqUniverse.assetReturns.A.plot()
+usEqUniverse.assetReturns.AA.plot()
