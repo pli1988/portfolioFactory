@@ -19,7 +19,7 @@ class universe(object):
         - filePath
         - tickers
     '''
-#    def __init__(self,configPath):
+
     def __init__(self, name):
         
         '''Pass name and select location of of return file      
