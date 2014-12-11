@@ -28,10 +28,12 @@ def averageHorizonReturn(data, horizon):
     
     cleanData = utils.processData(data) 
     
-    if 1<=horizon<=len(cleanData):    
+    if 1 <= horizon <= len(cleanData):    
     
         return np.mean(rollingReturn(cleanData, horizon))
+        
     else:
+        
         raise customExceptions.invalidInput('averageHorizonReturn') 
         
     
@@ -47,14 +49,16 @@ def rollingReturn(data, horizon):
     
     cleanData = utils.processData(data)
     
-    if 1<=horizon<=len(cleanData):    
+    if 1 <= horizon <= len(cleanData):    
 
         # Calculate rolling returns
         rollingReturns = pd.rolling_apply(cleanData, horizon, lambda x: np.prod(1 + x) - 1)        
         return rollingReturns
         
     else:
+        
         raise customExceptions.invalidInput('averageHorizonReturn') 
         
 if __name__ == "__main__":
     main()    
+    

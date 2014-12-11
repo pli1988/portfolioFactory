@@ -35,7 +35,7 @@ class universe(object):
             self.filePath = filePath 
             self.__setReturn()
             self.__setTickers()
-        except :
+        except:
             raise 
 
     def __setReturn(self):
