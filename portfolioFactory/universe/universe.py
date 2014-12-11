@@ -1,19 +1,12 @@
 """
-# -*- coding: utf-8 -*-
-
-Created on Wed Nov 26 16:05:31 2014
-
-@author: peter
+Author: Peter Li
 """
-
-
-# TODO: Add frequency parameter ??? maybe
-# TODO: Add Checks
-# TODO: Move fetchPrices to utility
-# TODO: Add summary 
-
 import pandas as pd
 import numpy as np
+
+from ..utils import getFileLocation
+from ..utils import utils as utils
+from ..utils import customExceptions
 
 class universe(object):
     ''' Universe is a class to represent the set of possible investments. 
@@ -21,51 +14,31 @@ class universe(object):
     This class contains asset class returns and associated metadata.     
     
     Public Attributes:
-        - parameters
         - assetReturns
         - summary
+        - filePath
         - tickers
     '''
-    
-    def __init__(self,configPath):
+
+    def __init__(self, name):
         
-        '''Reads in parameters from configPath and loads asset returns      
+        '''Pass name and select location of of return file      
         
         Args:
             configPath (str): location of config file
           
         '''
+
+        filePath = getFileLocation.getFileLocation()
+        self.name = name
         
-        self.parameters = self.__setParameters(configPath) 
-        self.__setReturn()
-        
-# TODO: Add checks for if file exists     
-    def __setParameters(self, configPath):
-        """ Method to read config file
-        
-        Note:
-            configPath is assumed to be a .txt file with (at least) the following fields:
-              - totallReturnFilePath
-        
-        Args:
-            configPath (str): location of config file
-          
-        Returns:
-            A dict with {key = parameter name: value = parameter value} 
-          
-        """
-        
-        # Load Data
-        parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
-        parameters.columns = ['values']        
-        
-        # Strip spaces
-        parameters = parameters.astype('string')        
-        parameters.index = parameters.index.map(str.strip)        
-        parameters = parameters['values'].map(str.strip)
-        
-        return parameters.to_dict()
-        
+        try:
+            self.filePath = filePath 
+            self.__setReturn()
+            self.__setTickers()
+        except:
+            raise 
+
     def __setReturn(self):
         
         """ Method to set self.returns
@@ -75,9 +48,17 @@ class universe(object):
                     
         """
         
-        totalReturnsPath = self.parameters['totalReturnFilePath']
-               
-        self.assetReturns = pd.read_pickle(totalReturnsPath)
+        # Trys to read data file
+        try:    
+            data = pd.read_pickle(self.filePath)
+            
+            # Checks if read file meets criteria
+            if self.checkData(data):
+                self.assetReturns = data
+            else:
+                raise customExceptions.badData('Pickled file is not a proper Dataframe')
+        except:
+            raise customExceptions.badData('File is not a pickle')
         
     def __setTickers(self):
         
@@ -87,9 +68,8 @@ class universe(object):
         
         """        
         
-        self.tickers = self.returns.columns.values
+        self.tickers = self.assetReturns.columns.values
 
-# Maybe move to utility ???
     def computeSummary(self):
         """ Method to compute summary statistics for return dataframe
         
@@ -102,7 +82,7 @@ class universe(object):
                 - standard deviation (unadjusted)        
         """
         
-        df = self.assetReturns        
+        df = self.assetReturns
         
         # Summary statistiscs
         summary = df.describe()
@@ -119,3 +99,19 @@ class universe(object):
         self.summary = out[outOrder]
         
         return self.summary
+        
+    def checkData(self, data):                
+        
+        # Check if returns is a Dataframe
+        if isinstance(data, pd.DataFrame):
+        
+            # Check if index is dates
+            if isinstance(data.index, pd.tseries.index.DatetimeIndex):
+        
+                # Check if sequential
+                if utils.checkSeqentialMonthly(data.index):
+                    
+                    return True
+
+        return False
+                    
