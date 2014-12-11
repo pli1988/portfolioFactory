@@ -4,7 +4,6 @@ Author: Peter Li
 import pandas as pd
 import numpy as np
 
-from ..utils import getFileLocation
 from ..utils import utils as utils
 from ..utils import customExceptions
 
@@ -20,7 +19,7 @@ class universe(object):
         - tickers
     '''
 
-    def __init__(self, name):
+    def __init__(self, name, assetReturnsPath):
         
         '''Pass name and select location of of return file      
         
@@ -29,11 +28,10 @@ class universe(object):
           
         '''
 
-        filePath = getFileLocation.getFileLocation()
+        self.filePath = assetReturnsPath
         self.name = name
         
         try:
-            self.filePath = filePath 
             self.__setReturn()
             self.__setTickers()
         except:

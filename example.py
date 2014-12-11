@@ -27,9 +27,7 @@ usEqUniverse = universe.universe('testUniverse')
 #configFilePath = getFileLocation.getFileLocation()
 
 configFilePath = '/home/peter/Documents/Homework/ProgrammingForDatascience/finalProject2/portfolioFactory/portfolioFactory/strategy/SampleFiles/strategyConfig_1_5.txt'
-
 testStrategy = strategy.strategy(usEqUniverse, configFilePath)
-
 testPortfolio =  portfolio.portfolio([testStrategy],[1])
 
     
