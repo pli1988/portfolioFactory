@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Dec 10 12:38:21 2014
+Created on Tue Dec  9 13:17:53 2014
 
-@author: Israel
+Author: Peter Li and Israel
 """
+
+class badData(Exception):
+    pass
+
+class invalidInput(Exception):
+    pass
 
 class invalidParameterPath(Exception) :
         def __init__(self,msg='') :

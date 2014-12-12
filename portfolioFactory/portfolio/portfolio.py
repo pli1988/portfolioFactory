@@ -62,7 +62,7 @@ class portfolio(object):
         self.scheme = weights[:]
         self.strategies = strats
         self.portReturns = self.__calcPort()
-     
+        self.weights = self.__calcWeights()
 
 
 
@@ -76,17 +76,29 @@ class portfolio(object):
         
         portWeights = pd.DataFrame(pd.Series(self.scheme, index=self.strategies))
         portElements = {x.parameters['name'] : x.strategyReturns for x in self._pool}
-        portData = pd.DataFrame(portElements)
+        self._portData = pd.DataFrame(portElements)
         
         convertFunction = lambda x: float(x[0])
-        return portData.dot(portWeights).apply(convertFunction,axis=1)
+        return self._portData.dot(portWeights).apply(convertFunction,axis=1)
         
 
     def __calcWeights(self):
         ''' Method to calculate the overall weight in a particular stock of a portfolio
-        
        
         '''
+        scaled = pd.DataFrame(index=self._portData.index,columns=self._portData.columns)
+        
+        strategyWeights = {x.parameters['name'] : x.weights for x in self._pool}
+        portWeights =         
+        
+        for i in len(self.strategies):
+            scaled = scaled+(self.scheme[i])
+        matrix = [x.weights for x in self._pool]
+        zipped = zip(matrix,self.scheme)
+        scaleElements = [pd.DataFrame(a*b,index=a.index,columns=[a.columns]) for (a,b) in zipped]
+                
+        return zipped
+                
 
         
         

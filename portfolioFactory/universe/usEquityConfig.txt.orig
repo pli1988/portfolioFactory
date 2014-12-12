@@ -1,4 +1,0 @@
-universeName = USEquityUniverse
-totalReturnFilePath = ./portfolioFactory/universe/totalReturnData
-currency = USD
-nanFill = 'ffill'
