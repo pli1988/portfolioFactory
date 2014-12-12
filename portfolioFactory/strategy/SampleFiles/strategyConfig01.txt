@@ -1,4 +1,0 @@
-name = USEquityStrategy
-signalPath = strategyTesting/testSignal01
-rebalanceWindow = 12
-rule = 2

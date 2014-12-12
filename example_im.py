@@ -16,6 +16,7 @@ def save_object(obj, filename):
 
 #file name is text.pkl
 
+import portfolioFactory
 import portfolioFactory.universe.universe as universe
 import portfolioFactory.strategy.strategy as strategy
 import portfolioFactory.portfolio.portfolio as portfolio
@@ -28,7 +29,7 @@ testStrategy = strategy.strategy(testUni,location+'strategyConfig_1_2.txt')
 testStrategy2 = strategy.strategy(testUni,location+'strategyConfig_1_2.txt')
 testStrategy.parameters['name'] = 'USEquityStrategy02'
 testPort = portfolio.portfolio([testStrategy,testStrategy2],[3,7])
-testPort.weights = 10*testStrategy.weights.copy()
 
-save_object(testStrategy,'testStrategy')
-save_object(testPort,'testPort')
+
+#save_object(testStrategy,'testStrategy')
+#save_object(testPort,'testPort')

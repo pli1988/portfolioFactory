@@ -86,9 +86,28 @@ class portfolio(object):
         ''' Method to calculate the overall weight in a particular stock of a portfolio
        
         '''
-        scaled = pd.DataFrame(index=self._portData.index,columns=self._portData.columns)
+        #create a dictionary with strategy name as key and loading as value
+        loadingsMap = {}
+        for i in range(0,len(self.strategies)):
+            loadingsMap[self._pool[i].parameters['name']] = self.scheme[i]
+            
+        #create a dictionary with strategy name as key and investment weights as value
+        strategyMap = {x.parameters['name'] : x.weights for x in self._pool}   
         
-        strategyWeights = {x.parameters['name'] : x.weights for x in self._pool}
+        # intialize a empty dataframe
+        allTickers = []
+        for x in self._pool:
+            allTickers.extend(x.weights.columns)
+        allTickers = set(allTickers)
+        
+        weightsTemplate=pd.DataFrame(0,index=self._portData.index,columns=allTickers)        
+        
+        # then add (invest weights X loadings) piecewise
+        for i in strategyMap.keys():
+            weightsTemplate = weightsTemplate + (loadingsMap[i]*strategyMap[i])
+        
+        return weightsTemplate
+            
 
                 
 
