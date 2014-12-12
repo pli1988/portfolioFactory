@@ -89,15 +89,7 @@ class portfolio(object):
         scaled = pd.DataFrame(index=self._portData.index,columns=self._portData.columns)
         
         strategyWeights = {x.parameters['name'] : x.weights for x in self._pool}
-        portWeights =         
-        
-        for i in len(self.strategies):
-            scaled = scaled+(self.scheme[i])
-        matrix = [x.weights for x in self._pool]
-        zipped = zip(matrix,self.scheme)
-        scaleElements = [pd.DataFrame(a*b,index=a.index,columns=[a.columns]) for (a,b) in zipped]
-                
-        return zipped
+
                 
 
         

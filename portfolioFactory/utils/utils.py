@@ -67,11 +67,11 @@ def checkSeqentialMonthly(index):
         yearsDiff = years[1:] - years[0:-1]
         ix = np.where(yearsDiff == 1)
         
-    # If years are sequential
-    if all(months[ix] == 12):      
-        return True        
-    else:        
-        return False        
+        # If years are sequential
+        if all(months[ix] == 12):      
+            return True        
+        else:        
+            return False        
 
 
 def setParameters(configPath):
