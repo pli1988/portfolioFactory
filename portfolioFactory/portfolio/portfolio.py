@@ -1,5 +1,9 @@
-# -*- coding: utf-8 -*-
 
+"""
+Portfolio is a module that defines the portfolio class
+
+Author: Israel Malkin
+"""
 
 import pandas as pd
 import numpy as np
@@ -31,6 +35,16 @@ class portfolio(object):
         Arguments:
             strategyPool (list): a list of unique strategy objects
             universe (universe): a list of numeric strategy weights
+            
+        User input is verified, ensuring:
+            - both inputs are lists
+            - both input lists are of equal length
+            - elements of the strategyPool (first arg) are strategy objects
+            - elements of weights (second arg) are numeric 
+            - there are no duplicate strategies
+            
+        If any of the checks do not pass, an exception is raised
+        
         '''
         
         # confirm both inputs are lists
@@ -71,8 +85,10 @@ class portfolio(object):
     def __calcPort(self):
         ''' Method to calculate the overall return of a portfolio
         
-            The overall returns is calculated as the weighted sum of the strategies       
-            Returns a single-column dataframe with the returns of the portfolio
+            The overall returns is calculated as the weighted sum of the strategies
+            
+            Result:
+            Sets self.portReturns with a single-column dataframe with the returns of the portfolio
         '''
         
         portWeights = pd.DataFrame(pd.Series(self.scheme, index=self.strategies))
@@ -84,9 +100,12 @@ class portfolio(object):
         
 
     def __calcWeights(self):
-        ''' Method to calculate the overall weight in a particular stock of a portfolio
+        ''' Method to calculate the overall weight in a particular investment
+        
+            The weight of each investment is calculated as the the weighted sum of the strategy-specific weights.
             
-            
+            Results:
+            Sets self.weights with the overall weight attributed to each possible investment
         '''
         #create a dictionary with strategy name as key and loading as value
         loadingsMap = {}

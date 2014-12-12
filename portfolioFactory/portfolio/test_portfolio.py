@@ -1,7 +1,7 @@
 
 
 """
-unit tests for Portfolio Class
+test_portfolio is a module to run unit tests for portfolio Class
 
 
 To run all test:  >> python -m unittest discover

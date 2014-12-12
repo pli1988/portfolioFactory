@@ -1,0 +1,4 @@
+name = Strategy_Ex1
+signalPath = ./ExampleFiles/signal_Ex1
+rebalanceWindow = 12
+rule = 300

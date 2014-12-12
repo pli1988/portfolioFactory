@@ -1,13 +1,14 @@
 
 
 """
-unit tests for Strategy Class
+test_strategy is a module to run unit tests for strategy Class
 
 
 To run all test:  >> python -m unittest discover
 
 Author: Israel Malkin
 """
+
 
 import unittest
 import pandas as pd
