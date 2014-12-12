@@ -9,7 +9,9 @@ import portfolioFactory
 import portfolioFactory.universe.universe as universe
 import portfolioFactory.strategy.strategy as strategy
 import portfolioFactory.portfolio.portfolio as portfolio
+import portfolioFactory.plottingIM.plotWithStats as plot
 from   portfolioFactory.utils.utils import calcRollingReturns
+
 
 location = './ExampleFiles/'
 
@@ -19,7 +21,7 @@ rollingReturns_Ex1 = calcRollingReturns(universe_Ex1.assetReturns,12).shift(peri
 rollingReturns_Ex1.to_pickle(location+'signal_Ex1')
 strategy_Ex1 = strategy.strategy(universe_Ex1,location+'config_Ex1.txt')
 
-
+plot(strategy_Ex1.strategyReturns,2001,2008)
 
 universe_Ex2 = universe.universe('Universe_Ex2',location+'totalReturnData')
 rollingReturns_Ex2 = calcRollingReturns(universe_Ex2.assetReturns,6).shift(period=1).truncate(before="01/01/1999",after="31/01/2009")
