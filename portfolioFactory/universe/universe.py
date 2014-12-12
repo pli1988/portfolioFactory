@@ -15,6 +15,12 @@ Created on Wed Nov 26 16:05:31 2014
 import pandas as pd
 import numpy as np
 
+<<<<<<< HEAD
+=======
+from ..utils import utils as utils
+from ..utils import customExceptions
+
+>>>>>>> origin/pliDEV
 class universe(object):
     ''' Universe is a class to represent the set of possible investments. 
     
@@ -26,15 +32,15 @@ class universe(object):
         - summary
         - tickers
     '''
-    
-    def __init__(self,configPath):
-        
+
+    def __init__(self, name, assetReturnsPath):
         '''Reads in parameters from configPath and loads asset returns      
         
         Args:
             configPath (str): location of config file
           
         '''
+
         
         self.parameters = self.__setParameters(configPath) 
         self.__setReturn()
@@ -66,6 +72,7 @@ class universe(object):
         
         return parameters.to_dict()
         
+
     def __setReturn(self):
         
         """ Method to set self.returns

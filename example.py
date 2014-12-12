@@ -6,8 +6,45 @@ import pandas as pd
 import portfolioFactory.universe.universe as universe
 import portfolioFactory.strategy.strategy as strategy
 import portfolioFactory.portfolio.portfolio as portfolio
+from portfolioFactory.utils import getFileLocation
+
+# Create Instance of universe for US Equities
+#usEqUniverse = universe.universe('portfolioFactory/universe/usEquityConfig.txt')
 
 
+assetReturnsPath = getFileLocation.getFileLocation()
+
+
+#configFilePath = getFileLocation.getFileLocation()
+
+
+assetReturnsPath = '/home/peter/Documents/Homework/ProgrammingForDatascience/finalProject2/portfolioFactory/portfolioFactory/universe/totalReturnData' 
+configFilePath = '/home/peter/Documents/Homework/ProgrammingForDatascience/finalProject2/portfolioFactory/portfolioFactory/strategy/SampleFiles/strategyConfig_1_5.txt'
+
+
+usEqUniverse = universe.universe('testUniverse', assetReturnsPath)
+testStrategy = strategy.strategy(usEqUniverse, configFilePath)
+testPortfolio =  portfolio.portfolio([testStrategy],[1])
+
+    
+    
+
+
+
+testSeries = testStrategy.strategyReturns
+
+utils.checkSeqentialMonthly(testSeries.index)
+riskMetrics.maxDrawdown(testSeries)
+riskMetrics.VaR(testSeries, 12, 95)
+retMetrics.rollingReturn(testSeries, 6).plot()
+
+
+# Get Summary Statistics
+
+usEqUniverse.computeSummary()
+
+# Plot Return
+usEqUniverse.assetReturns.A.plot()
 
 def createUniverse(config):
         
