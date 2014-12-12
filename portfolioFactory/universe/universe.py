@@ -1,5 +1,8 @@
 """
+The universe module contains the universe class. 
+
 Author: Peter Li
+
 """
 import pandas as pd
 import numpy as np
@@ -21,15 +24,22 @@ class universe(object):
 
     def __init__(self, name, assetReturnsPath):
         
-        '''Pass name and select location of of return file      
+        '''Pass name and select location of asset return file
+        
+        Note: assetReturnsPath sholud be the location of a pickled dataframe        
         
         Args:
-            configPath (str): location of config file
+            name (str): universe name
+            assetReturnPath(str): location of assetReturns
           
         '''
 
         self.filePath = assetReturnsPath
-        self.name = name
+        
+        if isinstance(name, str):
+            self.name = name
+        else:
+            raise customExceptions.badData('Name must be a str')
         
         try:
             self.__setReturn()
@@ -39,10 +49,14 @@ class universe(object):
 
     def __setReturn(self):
         
-        """ Method to set self.returns
+        """ Method to set self.assetReturns
+        
+        setReturns attempts to load the file in self.filePath and set it as
+        self.assetReturns. The methods checks the validity of the file and returns
+        an error if checkData fails.         
         
         Note:
-            Assumes returns data exists in a pickled  pandas data frame
+            Assumes returns data exists in a pickled Pandas data frame
                     
         """
         
@@ -52,17 +66,22 @@ class universe(object):
             
             # Checks if read file meets criteria
             if self.checkData(data):
+                
                 self.assetReturns = data
+                
             else:
+                
                 raise customExceptions.badData('Pickled file is not a proper Dataframe')
+                
         except:
+            
             raise customExceptions.badData('File is not a pickle')
         
     def __setTickers(self):
         
         """ Method to set self.tickers
 
-        Extracts asset class tickers from returns dataframe
+        Method to extracts asset class tickers from returns dataframe
         
         """        
         
@@ -78,6 +97,7 @@ class universe(object):
                 - min
                 - max
                 - standard deviation (unadjusted)        
+                
         """
         
         df = self.assetReturns
@@ -98,7 +118,15 @@ class universe(object):
         
         return self.summary
         
-    def checkData(self, data):                
+    def checkData(self, data):     
+        """ Method to check data validity for return dataframe
+        
+        checkData will check if the returns data is a pandas dataframe of 
+        sequential monthly data.
+        
+        Returns: True/False
+ 
+     """           
         
         # Check if returns is a Dataframe
         if isinstance(data, pd.DataFrame):

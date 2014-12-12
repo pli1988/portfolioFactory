@@ -1,7 +1,11 @@
 """
-Author: Peter Li
+test_riskMetrics contains the unit tests for riskMetrics module
+
+To run all test, go to the the main ./portfolioFactory directory and run
 
 >> python -m unittest discover
+
+Author: Peter Li
 
 """
 
@@ -13,19 +17,22 @@ from ..utils import customExceptions as customExceptions
 
 
 class TestRiskMetricsFunctions(unittest.TestCase):
+    '''Test cases for retMeterics'''
 
     def setUp(self):
-        
+        # Date ranges
         self.monthRange = pd.date_range('1/1/1990', periods=20, freq='M')
         self.dayRange = pd.date_range('1/1/1990', periods=20, freq='d')
         
     def createMonthlySeries(self, value):
+        # Function to create monthly series
         
         constSeries = pd.Series(value, index = self.monthRange)        
     
         return constSeries
         
     def createDailySeries(self, value):
+        # Function to create daily series
     
         constSeries = pd.Series(value, index = self.dayRange)        
 

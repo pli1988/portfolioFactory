@@ -1,9 +1,9 @@
-
 """
-
-This module contains a collection of risk metrics to operate on Pandas timeseries
+riskMetrics is a module that contains a collection of functions to compute
+common risk metrics on Pandas timeseries.
 
 Author: Peter Li
+
 """
 
 import pandas as pd
@@ -15,13 +15,15 @@ def main():
     pass
 
 def maxDrawdown(data):
-    """ Calculate maximum drawdown
+    """  Function to calculate maximum drawdown
     
-    Args:
+    Maximum drawdown is the maximum peak-to-trough loss    
+    
+    Input:
         data (Pandas timeseries): timeseries of returns
       
     Returns:
-        Maximum peak to trough loss 
+        drawdown (scalar): maximum % loss 
       
     """    
     
@@ -41,9 +43,9 @@ def maxDrawdown(data):
     
 def annualizedVolatility(data):
     
-    """ Calculate annalized volatility
+    """ Function to calculate annalized volatility
     
-    Args:
+    Input:
         data (Pandas timeseries): timeseries of returns
       
     Returns:
@@ -58,7 +60,7 @@ def annualizedVolatility(data):
     return vol
     
 def VaR(data, horizon, probability):
-    """ Calculate historical value at risk
+    """ Function to Calculate historical value at risk
     
      For a given return series, horizon, and probability (p), VaR is the threshold 
      loss value, such that the probability that the loss over the given time 
@@ -69,12 +71,12 @@ def VaR(data, horizon, probability):
      If the 95%, 1-Year VaR = -15%, then 95% of the time we would expect the 
      1-Year returns to be greater than -15%. 
     
-    Example: VaR(data,12, 0.95)
+    Example: VaR(data,12, 95)
     
-    Args:
+    Input:
         - data (Pandas timeseries): timeseries of returns
         - horizon (num): number of periodss for historical VaR
-        - confidence (num): confidence level 
+        - confidence (num): confidence level in percent i.e.enter 95 for 95%
       
     Returns:
         VaR
@@ -83,10 +85,10 @@ def VaR(data, horizon, probability):
     
     cleanData = utils.processData(data)
     
-    if (1<=horizon<=len(cleanData)) & (0<=probability<=100):            
+    if ((1<=horizon<=len(cleanData)) & isinstance(horizon, int)) & (0<=probability<=100):            
     
-        # Calculate annualized rolling returns
-        rollingReturns = pd.rolling_apply(cleanData, horizon, lambda x: np.prod(1 + x)**(12/horizon) - 1)
+        # Calculate rolling returns
+        rollingReturns = pd.rolling_apply(cleanData, horizon, lambda x: np.prod(1 + x) - 1)
         
         VaR = np.percentile(rollingReturns.dropna(), 100 - probability)
         

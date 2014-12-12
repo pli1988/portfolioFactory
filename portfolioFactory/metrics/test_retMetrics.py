@@ -1,12 +1,7 @@
 """
+test_retMetrics contains the unit tests for retMetrics module
 
-unit tests for retMetrics module
-
-Note: data validation only checks with misspecified frequency i.e. annual data
-more validation checks take place in unit test for utils
-
-
-To run all test:
+To run all test, go to the the main ./portfolioFactory directory and run
 
 >> python -m unittest discover
 
@@ -20,11 +15,11 @@ import pandas as pd
 import portfolioFactory.metrics.retMetrics as retMetrics
 from ..utils import customExceptions as customExceptions
 
-
 class TestRetMetricsFunctions(unittest.TestCase):
+    '''Test cases for retMeterics'''
 
     def setUp(self):
-        
+        # Date Ranges
         self.monthRange = pd.date_range('1/1/1990', periods=20, freq='M')
         self.dayRange = pd.date_range('1/1/1990', periods=20, freq='d')
         
@@ -45,13 +40,13 @@ class TestRetMetricsFunctions(unittest.TestCase):
 ##############################################################################
 
     def testaverageHorizonReturn_badData(self):
-        # Quick check of data validation, main check will be in test of util.trim
+        # Check for data validation - file not monthly
         testSeries = self.createDailySeries(1)
         
         self.assertRaises(customExceptions.badData, retMetrics.averageHorizonReturn, testSeries, 12)
 
     def testaverageHorizonReturn_badDataStr(self):
-        # Quick check of data validation, main check will be in test of util.trim
+        # Check for data validation - file contains str
         testSeries = self.createMonthlySeries('a')
         
         self.assertRaises(customExceptions.badData, retMetrics.averageHorizonReturn, testSeries, 12)
@@ -75,7 +70,7 @@ class TestRetMetricsFunctions(unittest.TestCase):
 ##############################################################################
 
     def testcumulativeReturn_invalidInput(self):
-        # Quick check of data validation, main check will be in test of util.trim
+        # Check for data validation - file not monthly
         testSeries = self.createDailySeries(1)
         
         self.assertRaises(customExceptions.badData, retMetrics.cumulativeReturn, testSeries)
@@ -91,13 +86,13 @@ class TestRetMetricsFunctions(unittest.TestCase):
 ##############################################################################
 
     def testrollingReturn_badData(self):
-        # Quick check of data validation, main check will be in test of util.trim
+        # Check for data validation - file not monthly
         testSeries = self.createDailySeries(1)
         
         self.assertRaises(customExceptions.badData, retMetrics.rollingReturn, testSeries, 12)
 
     def testrollingReturn_badHorizon(self):
-        # Quick check of data validation, main check will be in test of util.trim
+        # Check for data validation - file not monthly
         testSeries = self.createMonthlySeries(0.5)
         
         self.assertRaises(customExceptions.invalidInput, retMetrics.rollingReturn, testSeries, 0.5)   
