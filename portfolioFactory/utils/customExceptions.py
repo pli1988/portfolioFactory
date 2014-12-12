@@ -92,6 +92,12 @@ class badWeightError(Exception) :
         def __str__(self):
             return repr(self.m)
             
+class duplicatesError(Exception) :
+        def __init__(self,msg='') :
+            self.m="Two strategies with the same name (in parameters dictionary) were passed"
+        def __str__(self):
+            return repr(self.m)
+            
 ######################################################
             
 class notDFError(Exception) :

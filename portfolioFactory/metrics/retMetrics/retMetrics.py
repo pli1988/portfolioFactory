@@ -5,7 +5,7 @@ Collection of return metrics to operate on pandas (time)series and dataframes
 """
 
 import pandas as pd
-import nympy as np
+import numpy as np
 
 
 def main():

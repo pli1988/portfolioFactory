@@ -1,100 +1,126 @@
-# -*- coding: utf-8 -*-
+
+
 """
-@author: Israel
+unit tests for Strategy Class
+
+
+To run all test:  >> python -m unittest discover
+
+Author: Israel Malkin
 """
 
-''' Module to preform unit tests on strategy class
-
-'''
-    
+import unittest
 import pandas as pd
 import numpy as np
-from portfolioFactory.universe import universe as universe
-from portfolioFactory.strategy import strategy as strategy
-from portfolioFactory.utils.utils import calcRollingReturns as calcRollingReturns
 
-location = "portfoliofactory/strategy/SampleFiles/"
-
-
-# pickle subsets of the full data
-allData = pd.read_pickle(location+'totalReturnData')
-allData[['AA','BA','IBM','HPQ','INT']].to_pickle(location+'uni_1_5')
-allData[['AA','BA']].to_pickle(location+'uni_1_2')
-allData[['HPQ','INT']].to_pickle(location+'uni_4_5')
+import portfolioFactory.universe.universe as universe
+import portfolioFactory.strategy.strategy as strategy
+from ..utils import customExceptions as customExceptions
 
 
-uni_1_5 = universe.universe(location+'config_uni_1_5.txt')
-signal_1_5 = calcRollingReturns(uni_1_5.assetReturns,6).shift(period=1)
-signal_1_5_early = signal_1_5.truncate(before="01/01/1996",after="31/12/2005")
-signal_1_5_late = signal_1_5.truncate(before="01/01/2006",after="31/12/2012")
+class TestStrategyFunctions(unittest.TestCase):
 
-uni_1_2 = universe.universe(location+'config_uni_1_2.txt')
-signal_1_2 = calcRollingReturns(uni_1_2.assetReturns,6).shift(period=1)
-signal_1_2_early = signal_1_2.truncate(before="01/01/1996",after="31/12/2005")
-signal_1_2_late = signal_1_2.truncate(before="01/01/2006",after="31/12/2012")
+    def createUniverse(self,config):
+        
+        location = "portfoliofactory/strategy/SampleFiles/"
+        return universe.universe(location+'config_'+config+'.txt')
+        
 
-uni_4_5 = universe.universe(location+'config_uni_4_5.txt')
-signal_4_5 = calcRollingReturns(uni_4_5.assetReturns,6).shift(period=1)
-signal_4_5_early = signal_4_5.truncate(before="01/01/1996",after="31/12/2005")
-signal_4_5_late = signal_4_5.truncate(before="01/01/2006",after="31/12/2012")
+        
+    def createStrategy(self,universe,config):
+        
+        location = "portfoliofactory/strategy/SampleFiles/"        
+        return strategy.strategy(universe,location+'strategyConfig_'+config+'.txt')
+        
 
-pd.to_pickle(signal_1_5,location+'signal_1_5')
-pd.to_pickle(signal_1_5_early,location+'signal_1_5_early')
-pd.to_pickle(signal_1_5_late,location+'signal_1_5_late')
-pd.to_pickle(signal_1_2,location+'signal_1_2')
-pd.to_pickle(signal_1_2_early,location+'signal_1_2_early')
-pd.to_pickle(signal_1_2_late,location+'signal_1_2_late')
-pd.to_pickle(signal_4_5,location+'signal_4_5')
-pd.to_pickle(signal_4_5_early,location+'signal_4_5_early')
-pd.to_pickle(signal_4_5_late,location+'signal_4_5_late')
+        
+##############################################################################
+# Test bad config file inputs
+##############################################################################
+        
+    def testBadConfig_ConfigPath(self):
+        
+        configUni = 'uni_1_5'
+        configStr = 'made_up'
+        testUni = self.createUniverse(configUni)
+        self.assertRaises(customExceptions.invalidParameterPath,self.createStrategy,testUni,configStr)
+        
+        
+    def testBadConfig_SignalPath(self):
+        
+        configUni = 'uni_1_5'
+        configStr = 'bad_signal'
+        testUni = self.createUniverse(configUni)
+        self.assertRaises(customExceptions.invalidSignalPath,self.createStrategy,testUni,configStr)
 
+    def testBadConfig_MissingInput(self):
+        
+        configUni = 'uni_1_5'
+        configStr = 'missing_input'
+        testUni = self.createUniverse(configUni)
+        self.assertRaises(customExceptions.missingInput,self.createStrategy,testUni,configStr)
+        
+    def testBadConfig_UnexpectedInput(self):
+        
+        configUni = 'uni_1_5'
+        configStr = 'extra_spec'
+        testUni = self.createUniverse(configUni)
+        self.assertRaises(customExceptions.unexpectedInput,self.createStrategy,testUni,configStr)
+        
+    def testBadConfig_StringRule(self):
+        
+        configUni = 'uni_1_5'
+        configStr = 'string_rule'
+        testUni = self.createUniverse(configUni)
+        self.assertRaises(customExceptions.ruleNotInt,self.createStrategy,testUni,configStr)
+        
+    def testBadConfig_WindowInt(self):
+        
+        configUni = 'uni_1_5'
+        configStr = 'string_rebalance'
+        testUni = self.createUniverse(configUni)
+        self.assertRaises(customExceptions.windowNotInt,self.createStrategy,testUni,configStr)
+        
+    def testBadConfig_WindowNeg(self):
+        
+        configUni = 'uni_1_5'
+        configStr = 'negative_rebalance'
+        testUni = self.createUniverse(configUni)
+        self.assertRaises(customExceptions.windowNegative,self.createStrategy,testUni,configStr)
+        
 
-### this one should work well
-stra_well = strategy.strategy(uni_1_5,location+'strategyConfig_1_5_late.txt')
+##############################################################################
+# Test mismatch between signal and returns
+##############################################################################
+        
+    def testOverlap_Tickers(self):
+        
+        configUni = 'uni_1_2'
+        configStr = '4_5'
+        testUni = self.createUniverse(configUni)
+        self.assertRaises(customExceptions.noTickerOverlap,self.createStrategy,testUni,configStr)
+        
+    def testOverlap_dates(self):
+        
+        configUni = 'uni_early'
+        configStr = '1_2_late'
+        testUni = self.createUniverse(configUni)
+        self.assertRaises(customExceptions.noTimeOverlap,self.createStrategy,testUni,configStr)
+        
+##############################################################################
+# Test lack of signal data
+##############################################################################
 
-### this one should raise notickeroverlap
-stra_ticker= strategy.strategy(uni_1_2,location+'strategyConfig_4_5.txt')
+    def testNoSignal(self):
+        
+        configUni = 'uni_early'
+        configStr = 'no_signal'
+        testUni = self.createUniverse(configUni)
+        self.assertRaises(customExceptions.notEnoughSignals,self.createStrategy,testUni,configStr)   
+        
 
-### this one should raise date overlap error
-uni_1_2.assetReturns = signal_1_2_early
-stra_time= strategy.strategy(uni_1_2,location+'strategyConfig_1_2_late.txt')
-
-### this one should raise missing input error
-stra_time= strategy.strategy(uni_1_2,location+'strategyConfig_missing_input.txt')
-
-### this one should raise unexpected input error
-stra_time= strategy.strategy(uni_1_2,location+'strategyConfig_extra_spec.txt')
-
-### this one should raise bad config path
-stra_time= strategy.strategy(uni_1_2,location+'strategyConfig_does_not_exist.txt')
-
-### this one should raise bad signal path
-stra_time= strategy.strategy(uni_1_2,location+'strategyConfig_bad_signal.txt')
-
-### this one should raise non-numeric rebalanceWindow
-stra_time= strategy.strategy(uni_1_2,location+'strategyConfig_string_rebalance.txt')
-
-### this one should raise negative rebalanceWindow
-stra_time= strategy.strategy(uni_1_2,location+'strategyConfig_negative_rebalance.txt')
-
-### this one should raise string rule
-stra_time= strategy.strategy(uni_1_2,location+'strategyConfig_string_rule.txt')
-
-### checking rebalncing calculation
-uni_4_5.assetReturns[['HPQ']] = np.ones((uni_4_5.assetReturns.shape[0],1))
-uni_4_5.assetReturns[['INT']] = np.ones((uni_4_5.assetReturns.shape[0],1))/2
-stra_time= strategy.strategy(uni_4_5,location+'strategyConfig_rebal_check.txt')
-
-
-'''
-class TestmergeIntervals(unittest.TestCase):
-    def setUp(self):
-        self.itema = interval("[5,10]")
-	   self.itemb = interval("(5,10)")
-        self.mymerge = mergeIntervals(self.itema,self.itemb)
-    def test_interior(self):
-        self.assertEqual(self.mymerge.leftreal, self.itema.leftreal)
+    
 
 if __name__ == '__main__':
-    unittest.main()
- '''
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestStrategyFunctions)
+    unittest.TextTestRunner(verbosity=2).run(suite)

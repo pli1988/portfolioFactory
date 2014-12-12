@@ -17,17 +17,19 @@ class portfolio(object):
     A portfolio is composed of a linear combination of strategies 
     
     Public Attributes:
-        - porfolioReturns (df): a single-column dataframe representing the porfolio returns
+        - portReturns (df): a single-column dataframe representing the porfolio returns
         - strategies (list) : a list with the strategy names composing the portfolio
-        - weights (list) : a list containing the weighting of each strategy
+        - scheme (list) : a list containing the weighting of each strategy
 
     '''
-    
+
+
+  
     def __init__(self,strategyPool,weights):
         ''' Method to intialize a porfolio object
             
-        Args:
-            strategyPool (list): a list of strategy objects
+        Arguments:
+            strategyPool (list): a list of unique strategy objects
             universe (universe): a list of numeric strategy weights
         '''
         
@@ -37,7 +39,7 @@ class portfolio(object):
         
         # confirm lists are the same length
         if len(strategyPool)!=len(weights):
-            raise customExceptions.listMismatch
+            raise customExceptions.listMismatchError
         
         # confirm elements of strategyPool are strategy objects
         for s in strategyPool:
@@ -48,18 +50,46 @@ class portfolio(object):
         for w in weights:
             if isinstance(w,(int, long, float))==False:
                 raise customExceptions.badWeightError
-        
-        
-        self.strategies = [x.parameters['name'] for x in strategyPool]
-        self.weights = weights[:]
-        
 
-        portWeights = pd.DataFrame(pd.Series(self.weights, index=self.strategies))
-        portElements = {x.parameters['name'] : x.strategyReturns for x in strategyPool}
+        # make sure there are no duplicate strategies
+        strats = [x.parameters['name'] for x in strategyPool]
+        if len(strats) > len(set(strats)):
+            raise customExceptions.duplicatesError
+        
+        
+        # once input has been verified, set attributes
+        self._pool = strategyPool
+        self.scheme = weights[:]
+        self.strategies = strats
+        self.portReturns = self.__calcPort()
+     
+
+
+
+
+
+    def __calcPort(self):
+        ''' Method to calculate the overall return of a portfolio
+        
+            Returns a single-column dataframe with the returns of the portfolio
+        '''
+        
+        portWeights = pd.DataFrame(pd.Series(self.scheme, index=self.strategies))
+        portElements = {x.parameters['name'] : x.strategyReturns for x in self._pool}
         portData = pd.DataFrame(portElements)
         
-        portReturns =  portData.dot(portWeights)
-        portReturns.columns = ['portReturns']
-        self.portfolioReturns = portReturns
+        convertFunction = lambda x: float(x[0])
+        return portData.dot(portWeights).apply(convertFunction,axis=1)
+        
+
+    def __calcWeights(self):
+        ''' Method to calculate the overall weight in a particular stock of a portfolio
+        
+       
+        '''
+
+        
+        
+
 
       

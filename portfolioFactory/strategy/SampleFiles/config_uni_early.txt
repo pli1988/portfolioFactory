@@ -1,0 +1,4 @@
+universeName = USEquityUniverse
+totalReturnFilePath = portfoliofactory/strategy/SampleFiles/uni_early
+currency = USD
+nanFill = 'ffill'

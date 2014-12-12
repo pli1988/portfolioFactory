@@ -6,9 +6,6 @@ Created on Sat Dec 06 15:27:38 2014
 """
 
 
-# TODO: Add Checks
-# TODO: Add summary
-# TODO: handle if first window data is missing
 
 import pandas as pd
 import numpy as np
