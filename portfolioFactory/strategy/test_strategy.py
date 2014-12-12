@@ -22,14 +22,14 @@ class TestStrategyFunctions(unittest.TestCase):
 
     def createUniverse(self,config):
         
-        location = "portfoliofactory/strategy/SampleFiles/"
+        location = "./portfolioFactory/strategy/SampleFiles/"
         return universe.universe('test',location+config)
         
 
         
     def createStrategy(self,universe,config):
         
-        location = "portfoliofactory/strategy/SampleFiles/"        
+        location = "./portfolioFactory/strategy/SampleFiles/"        
         return strategy.strategy(universe,location+'strategyConfig_'+config+'.txt')
         
 

@@ -71,6 +71,7 @@ class portfolio(object):
     def __calcPort(self):
         ''' Method to calculate the overall return of a portfolio
         
+            The overall returns is calculated as the weighted sum of the strategies       
             Returns a single-column dataframe with the returns of the portfolio
         '''
         
@@ -84,7 +85,8 @@ class portfolio(object):
 
     def __calcWeights(self):
         ''' Method to calculate the overall weight in a particular stock of a portfolio
-       
+            
+            
         '''
         #create a dictionary with strategy name as key and loading as value
         loadingsMap = {}

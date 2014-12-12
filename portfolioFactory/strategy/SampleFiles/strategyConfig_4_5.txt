@@ -1,4 +1,4 @@
 name = USEquityStrategy
-signalPath = portfoliofactory/strategy/SampleFiles/signal_4_5
+signalPath = ./portfolioFactory/strategy/SampleFiles/signal_4_5
 rebalanceWindow = 12
 rule = 2
