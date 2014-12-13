@@ -19,9 +19,8 @@ location = './ExampleFiles/'
 universe_Ex1 = universe.universe('Universe_Ex1',location+'totalReturnData')
 rollingReturns_Ex1 = calcRollingReturns(universe_Ex1.assetReturns,12).shift(period=1).truncate(before="01/01/1999",after="31/01/2009")
 rollingReturns_Ex1.to_pickle(location+'signal_Ex1')
-strategy_Ex1 = strategy.strategy(universe_Ex1,location+'config_Ex1.txt')
+strategy_Ex1 = strategy.strategy(universe_Ex1,location+'lklkl')
 
-plot(strategy_Ex1.strategyReturns,2001,2008)
 
 universe_Ex2 = universe.universe('Universe_Ex2',location+'totalReturnData')
 rollingReturns_Ex2 = calcRollingReturns(universe_Ex2.assetReturns,6).shift(period=1).truncate(before="01/01/1999",after="31/01/2009")
