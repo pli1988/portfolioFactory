@@ -94,6 +94,9 @@ def setParameters(configPath):
     """
     
     # Load Parameters Data
+    if configPath[-3:]!='txt':
+        customExceptions.invalidParameterPath("config must be a txt file")
+        
     try:
         parameters = pd.read_table(configPath , sep = '=', index_col = 0, header = None)
     except IOError:

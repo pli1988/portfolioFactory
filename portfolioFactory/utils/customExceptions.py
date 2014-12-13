@@ -13,7 +13,7 @@ class invalidInput(Exception):
 
 class invalidParameterPath(Exception) :
         def __init__(self,msg='') :
-            self.m="The specified config path did not return a pickled dataframe:"+str(msg)
+            self.m="The specified config path did not return a txt file:"+str(msg)
         def __str__(self):
             return repr(self.m)
             
