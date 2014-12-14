@@ -1,4 +1,4 @@
-name = Strategy_Ex3
-signalPath = ./ExampleFiles/signal_Ex3
-rebalanceWindow = 12
-rule = 300
+name = third example strategy
+signalPath = ./ExampleFiles/rolling_volatility_24m
+rebalanceWindow = 6
+rule = -200

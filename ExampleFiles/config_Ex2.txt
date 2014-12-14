@@ -1,4 +1,4 @@
-name = Strategy_Ex2
-signalPath = ./ExampleFiles/signal_Ex2
-rebalanceWindow = 12
+name = second example strategy
+signalPath = ./ExampleFiles/rolling_returns_12m
+rebalanceWindow = 6
 rule = 300
