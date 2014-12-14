@@ -1,4 +1,0 @@
-name = third example strategy
-signalPath = ./ExampleFiles/rolling_volatility_24m
-rebalanceWindow = 6
-rule = -200

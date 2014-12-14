@@ -1,4 +1,4 @@
-name = second example strategy
-signalPath = ./ExampleFiles/rolling_returns_12m
+name = third example strategy
+signalPath = ./ExampleFiles/rolling_volatility_24m
 rebalanceWindow = 6
-rule = 300
+rule = -200
